@@ -10,14 +10,14 @@
 ### 사용법
 
 ```bash
-npm run gen -- <이름>
+npm run generate -- <이름>
 
 ```
 
 ### 예시
 
 ```bash
-npm run gen -- my-app
+npm run generate -- my-app
 
 ```
 
