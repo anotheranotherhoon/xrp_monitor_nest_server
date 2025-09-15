@@ -1,20 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class NaverNewsItemDto {
-  @ApiProperty()
-  title: string;
+  @ApiProperty({ example: '뉴스 속보입니다.', description: '뉴스 제목' })
+  neTitle: string;
 
-  @ApiProperty()
-  originallink: string;
+  @ApiProperty({
+    example:
+      'https://news.naver.com/main/read.nhn?mode=LSD&mid=shm&sid1=101&oid=001&aid=001234567890',
+    description: '뉴스 원본 링크',
+  })
+  neOriginallink: string;
 
-  @ApiProperty()
-  link: string;
+  @ApiProperty({
+    example:
+      'https://news.naver.com/main/read.nhn?mode=LSD&mid=shm&sid1=101&oid=001&aid=001234567890',
+    description: '뉴스 링크',
+  })
+  neLink: string;
 
-  @ApiProperty()
-  description: string;
+  @ApiProperty({ example: '뉴스 속보입니다.', description: '뉴스 내용' })
+  nedescription: string;
 
-  @ApiProperty()
-  pubDate: string;
+  @ApiProperty({
+    example: '2024-01-01T12:34:56.000Z',
+    description: '뉴스 작성 시간',
+  })
+  neCreatedAt: string;
 }
 
 export class NaverNewsResponseDto {
