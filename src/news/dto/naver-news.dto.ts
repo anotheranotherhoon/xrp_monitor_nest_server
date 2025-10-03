@@ -9,7 +9,7 @@ export class NaverNewsItemDto {
       'https://news.naver.com/main/read.nhn?mode=LSD&mid=shm&sid1=101&oid=001&aid=001234567890',
     description: '뉴스 원본 링크',
   })
-  neOriginallink: string;
+  neOriginalLink: string;
 
   @ApiProperty({
     example:
@@ -19,7 +19,7 @@ export class NaverNewsItemDto {
   neLink: string;
 
   @ApiProperty({ example: '뉴스 속보입니다.', description: '뉴스 내용' })
-  nedescription: string;
+  neDescription: string;
 
   @ApiProperty({
     example: '2024-01-01T12:34:56.000Z',
