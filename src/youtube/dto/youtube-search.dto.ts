@@ -23,23 +23,35 @@ class YoutubeThumbnailsDto {
 }
 
 export class YoutubeSearchItemDto {
-  @ApiProperty({ example: 'dQw4w9WgXcQ' })
-  videoId: string;
+  @ApiProperty({ example: 'dQw4w9WgXcQ', description: 'Youtube 동영상 ID' })
+  yoVideoId: string;
 
-  @ApiProperty({ example: 'XRP 급등 소식과 리플 최신 이슈' })
-  title: string;
+  @ApiProperty({
+    example: 'XRP 급등 소식과 리플 최신 이슈',
+    description: 'Youtube 동영상 제목',
+  })
+  yoTitle: string;
 
-  @ApiProperty({ example: '리플(XRP) 가격 급등 관련 소식 정리...' })
-  description: string;
+  @ApiProperty({
+    example: '리플(XRP) 가격 급등 관련 소식 정리...',
+    description: 'Youtube 동영상 설명',
+  })
+  yoDescription: string;
 
-  @ApiProperty({ example: '2024-01-01T12:34:56Z' })
-  publishedAt: string;
+  @ApiProperty({
+    example: '2024-01-01T12:34:56Z',
+    description: 'Youtube 동영상 작성 시간',
+  })
+  yoCreatedAt: string;
 
-  @ApiProperty({ example: 'UC_x5XG1OV2P6uZZ5FSM9Ttw' })
-  channelId: string;
+  @ApiProperty({
+    example: 'UC_x5XG1OV2P6uZZ5FSM9Ttw',
+    description: 'Youtube 채널 ID',
+  })
+  yoChannelId: string;
 
-  @ApiProperty({ example: '크립토 채널' })
-  channelTitle: string;
+  @ApiProperty({ example: '크립토 채널', description: 'Youtube 채널 제목' })
+  yoChannelTitle: string;
 
   @ApiProperty({ type: YoutubeThumbnailsDto })
   thumbnails: YoutubeThumbnailsDto;

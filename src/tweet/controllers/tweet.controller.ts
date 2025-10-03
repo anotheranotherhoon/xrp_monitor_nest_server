@@ -6,10 +6,13 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TweetService } from '../services/tweet.service';
-import { ApiResponseWrapper } from '../../common/decorators/api-response.decorator';
-import { TweetItemDto, TweetListResponseDto } from '../dto/tweet.dto';
+import { TweetItemDto } from '../dto/tweet.dto';
+import {
+  TweetPaginatedResponseDto,
+  TweetPaginatedResultDto,
+} from '../dto/tweet-paginated-response.dto';
 
 @ApiTags('🐦tweet')
 @Controller('tweet')
@@ -19,11 +22,14 @@ export class TweetController {
   @Get('users/:id/tweets')
   @ApiParam({ name: 'id', example: '25073877', description: 'Twitter user id' })
   @ApiQuery({ name: 'max_results', required: false, example: 10 })
-  @ApiResponseWrapper(TweetListResponseDto, '특정 유저의 최근 트윗')
+  @ApiOkResponse({
+    type: TweetPaginatedResponseDto,
+    description: '특정 유저의 최근 트윗',
+  })
   async getUserTweets(
     @Param('id') id: string,
     @Query('max_results') maxResults?: number,
-  ): Promise<TweetListResponseDto> {
+  ): Promise<TweetPaginatedResultDto> {
     try {
       const validMax =
         maxResults && +maxResults > 0 && +maxResults <= 100 ? +maxResults : 10;
@@ -32,17 +38,26 @@ export class TweetController {
         maxResults: validMax,
       });
       const items: TweetItemDto[] = (raw?.data || []).map((it: any) => ({
-        id: it?.id,
-        text: it?.text,
-        createdAt: it?.created_at,
-        authorId: it?.author_id,
-        lang: it?.lang,
+        twId: it?.id,
+        twText: it?.text,
+        twCreatedAt: it?.created_at,
+        twAuthorId: it?.author_id,
+        twLang: it?.lang,
       }));
+      const total = raw?.meta?.result_count || items.length;
+      const perPage = validMax;
+      const currentPage = 1;
+      const lastPage = Math.max(1, Math.ceil(total / perPage));
+
       return {
-        nextCursorId: raw?.meta?.next_token ?? null,
-        pageSize: items.length,
-        total: raw?.meta?.result_count,
-        items,
+        nextCursor: raw?.meta?.next_token ?? null,
+        page: {
+          total: total,
+          perPage: perPage,
+          currentPage: currentPage,
+          lastPage: lastPage,
+        },
+        list: items,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -57,12 +72,15 @@ export class TweetController {
   @ApiQuery({ name: 'query', required: true, example: 'xrp' })
   @ApiQuery({ name: 'max_results', required: false, example: 10 })
   @ApiQuery({ name: 'next_token', required: false, example: undefined })
-  @ApiResponseWrapper(TweetListResponseDto, '트윗 최근 검색')
+  @ApiOkResponse({
+    type: TweetPaginatedResponseDto,
+    description: '트윗 최근 검색',
+  })
   async searchRecent(
     @Query('query') query: string,
     @Query('max_results') maxResults?: number,
     @Query('next_token') nextToken?: string,
-  ): Promise<TweetListResponseDto> {
+  ): Promise<TweetPaginatedResultDto> {
     try {
       if (!query || query.trim().length === 0) {
         throw new HttpException(
@@ -78,17 +96,26 @@ export class TweetController {
         nextToken,
       });
       const items: TweetItemDto[] = (raw?.data || []).map((it: any) => ({
-        id: it?.id,
-        text: it?.text,
-        createdAt: it?.created_at,
-        authorId: it?.author_id,
-        lang: it?.lang,
+        twId: it?.id,
+        twText: it?.text,
+        twCreatedAt: it?.created_at,
+        twAuthorId: it?.author_id,
+        twLang: it?.lang,
       }));
+      const total = raw?.meta?.result_count || items.length;
+      const perPage = validMax;
+      const currentPage = 1;
+      const lastPage = Math.max(1, Math.ceil(total / perPage));
+
       return {
-        nextCursorId: raw?.meta?.next_token ?? null,
-        pageSize: items.length,
-        total: raw?.meta?.result_count,
-        items,
+        nextCursor: raw?.meta?.next_token ?? null,
+        page: {
+          total: total,
+          perPage: perPage,
+          currentPage: currentPage,
+          lastPage: lastPage,
+        },
+        list: items,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;

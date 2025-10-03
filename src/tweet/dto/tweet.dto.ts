@@ -1,20 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TweetItemDto {
-  @ApiProperty({ example: '1234567890123456789', description: '트윗 ID' })
-  id: string;
+  @ApiProperty({ example: '1', description: '트윗 ID' })
+  twId: string;
 
   @ApiProperty({ example: 'XRP to the moon 🚀', description: '트윗 내용' })
-  text: string;
+  twText: string;
 
   @ApiProperty({ example: '2024-01-01T12:34:56.000Z', required: false })
-  createdAt?: string;
+  twCreatedAt?: string;
 
   @ApiProperty({ example: '25073877', required: false })
-  authorId?: string;
+  twAuthorId?: string;
 
   @ApiProperty({ example: 'en', required: false })
-  lang?: string;
+  twLang?: string;
 }
 
 export class TweetListResponseDto {
