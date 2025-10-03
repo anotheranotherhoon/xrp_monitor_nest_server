@@ -12,9 +12,11 @@ import {
   NewsPaginatedResponseDto,
   NewsPaginatedResultDto,
 } from '../dto/news-paginated-response.dto';
+import { Public } from '../../auth/decorators/public.decorator';
 
 @ApiTags('📰news')
 @Controller('news')
+@Public()
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 

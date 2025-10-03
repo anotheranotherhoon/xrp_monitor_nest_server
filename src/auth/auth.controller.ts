@@ -1,0 +1,92 @@
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import {
+  AuthResponseDto,
+  LogoutResponseDto,
+  UserDto,
+} from './dto/auth-response.dto';
+import { Public } from './decorators/public.decorator';
+import { User } from './decorators/user.decorator';
+import { User as UserEntity } from '../entities/user.entity';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+@ApiTags('🔐 인증')
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Public()
+  @Post('register')
+  @ApiOperation({ summary: '회원가입' })
+  @ApiResponse({
+    status: 201,
+    description: '회원가입 성공',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 409, description: '이미 사용 중인 이메일' })
+  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
+    return this.authService.register(registerDto);
+  }
+
+  @Public()
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '로그인' })
+  @ApiResponse({
+    status: 200,
+    description: '로그인 성공',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 401, description: '인증 실패' })
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
+    return this.authService.login(loginDto);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '로그아웃' })
+  @ApiResponse({
+    status: 200,
+    description: '로그아웃 성공',
+    type: LogoutResponseDto,
+  })
+  async logout(): Promise<LogoutResponseDto> {
+    // JWT는 stateless이므로 서버에서 별도 처리 불필요
+    // 클라이언트에서 토큰 삭제 처리
+    return {
+      message: '로그아웃이 성공적으로 처리되었습니다.',
+    };
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '사용자 프로필 조회' })
+  @ApiResponse({
+    status: 200,
+    description: '프로필 조회 성공',
+    type: UserDto,
+  })
+  async getProfile(@User() user: UserEntity): Promise<UserDto> {
+    return this.authService.getUserProfile(user.id);
+  }
+}

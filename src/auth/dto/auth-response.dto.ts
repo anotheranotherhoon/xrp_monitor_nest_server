@@ -1,0 +1,47 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+export class UserDto {
+  @ApiProperty({ example: 1, description: '사용자 ID' })
+  id: number;
+
+  @ApiProperty({ example: 'user@example.com', description: '사용자 이메일' })
+  email: string;
+
+  @ApiProperty({
+    example: 'XRP투자자',
+    description: '사용자 닉네임',
+    nullable: true,
+  })
+  nickname: string | null;
+
+  @ApiProperty({
+    example: '2024-01-01T00:00:00.000Z',
+    description: '계정 생성일',
+  })
+  createdAt: Date;
+}
+
+export class AuthDataDto {
+  @ApiProperty({
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSJ9...',
+    description: 'JWT 액세스 토큰',
+  })
+  accessToken: string;
+
+  @ApiProperty({ type: UserDto, description: '사용자 정보' })
+  user: UserDto;
+}
+
+export class AuthResponseDto {
+  @ApiProperty({ type: AuthDataDto, description: '인증 데이터' })
+  data: AuthDataDto;
+}
+
+export class LogoutResponseDto {
+  @ApiProperty({
+    example: '로그아웃이 성공적으로 처리되었습니다.',
+    description: '로그아웃 메시지',
+  })
+  message: string;
+}
