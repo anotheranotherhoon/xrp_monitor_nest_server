@@ -5,10 +5,13 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { NewsService, NaverNewsResponse } from '../services/news.service';
-import { ApiResponseWrapper } from '../../common/decorators/api-response.decorator';
-import { NaverNewsInfiniteResponseDto } from '../dto/naver-news.dto';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { NewsService } from '../services/news.service';
+import { NaverNewsItemDto } from '../dto/naver-news.dto';
+import {
+  NewsPaginatedResponseDto,
+  NewsPaginatedResultDto,
+} from '../dto/news-paginated-response.dto';
 
 @ApiTags('📰news')
 @Controller('news')
@@ -16,10 +19,10 @@ export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
   @Get('xrp/cursor')
-  @ApiResponseWrapper(
-    NaverNewsInfiniteResponseDto,
-    'XRP 뉴스 목록 조회 (커서 방식: 첫 호출 cursorId=-1)',
-  )
+  @ApiOkResponse({
+    type: NewsPaginatedResponseDto,
+    description: 'XRP 뉴스 목록 조회 (커서 방식: 첫 호출 cursorId=-1)',
+  })
   @ApiQuery({
     name: 'cursorId',
     required: true,
@@ -43,7 +46,7 @@ export class NewsController {
     @Query('display') display?: number,
     @Query('sort') sort?: string,
     @Query('cursorId') cursorId?: number,
-  ): Promise<NaverNewsResponse> {
+  ): Promise<NewsPaginatedResultDto> {
     try {
       // display 파라미터 검증 (1-100 사이)
       const validDisplay =
@@ -64,7 +67,27 @@ export class NewsController {
       const hasMore = data.start + data.display <= data.total;
       const nextCursorId = hasMore ? data.start + data.display : null;
 
-      return { ...data, nextCursorId } as any;
+      const currentPage = Math.ceil(data.start / data.display);
+      const lastPage = Math.ceil(data.total / data.display);
+
+      const items: NaverNewsItemDto[] = data.items.map((item) => ({
+        neTitle: item.title,
+        neOriginalLink: item.originallink,
+        neLink: item.link,
+        neDescription: item.description,
+        neCreatedAt: item.pubDate,
+      }));
+
+      return {
+        nextCursor: nextCursorId,
+        page: {
+          total: data.total,
+          perPage: data.display,
+          currentPage: currentPage,
+          lastPage: lastPage,
+        },
+        list: items,
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -77,15 +100,15 @@ export class NewsController {
   }
 
   @Get('xrp/offset')
-  @ApiResponseWrapper(
-    NaverNewsInfiniteResponseDto,
-    'XRP 뉴스 목록 조회 (offset 방식)',
-  )
+  @ApiOkResponse({
+    type: NewsPaginatedResponseDto,
+    description: 'XRP 뉴스 목록 조회 (offset 방식)',
+  })
   async getXrpNewsByOffset(
     @Query('offset') offset?: number,
     @Query('limit') limit?: number,
     @Query('sort') sort?: string,
-  ): Promise<NaverNewsResponse> {
+  ): Promise<NewsPaginatedResultDto> {
     try {
       const validLimit = limit && limit > 0 && limit <= 100 ? limit : 10;
       const validSort = sort === 'sim' ? 'sim' : 'date';
@@ -97,7 +120,30 @@ export class NewsController {
         validSort,
         startFromOffset,
       );
-      return data as any;
+
+      const currentPage = Math.ceil(startFromOffset / validLimit);
+      const lastPage = Math.ceil(data.total / validLimit);
+      const hasMore = startFromOffset + validLimit <= data.total;
+      const nextCursor = hasMore ? startFromOffset + validLimit - 1 : null;
+
+      const items: NaverNewsItemDto[] = data.items.map((item) => ({
+        neTitle: item.title,
+        neOriginalLink: item.originallink,
+        neLink: item.link,
+        neDescription: item.description,
+        neCreatedAt: item.pubDate,
+      }));
+
+      return {
+        nextCursor: nextCursor,
+        page: {
+          total: data.total,
+          perPage: validLimit,
+          currentPage: currentPage,
+          lastPage: lastPage,
+        },
+        list: items,
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

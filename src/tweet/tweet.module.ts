@@ -11,7 +11,8 @@ import { TweetRepository } from './repositories/tweet.repository';
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        baseURL: 'https://api.twitter.com/2',
+        // baseURL: 'https://api.twitter.com/2',
+        baseURL: 'https://api.x.com/2/',
         timeout: 10000,
         headers: {
           Authorization: `Bearer ${configService.get<string>('X_BEARER_TOKEN')}`,
