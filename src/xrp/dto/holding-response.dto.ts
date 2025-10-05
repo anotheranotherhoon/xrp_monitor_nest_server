@@ -5,17 +5,17 @@ export class XrpHoldingDto {
   @ApiProperty({ example: 1, description: '보유 정보 ID' })
   id: number;
 
-  @ApiProperty({ example: 1000.123456, description: 'XRP 보유 수량' })
-  quantity: number;
+  @ApiProperty({ example: '1000.12345600', description: 'XRP 보유 수량' })
+  quantity: string;
 
-  @ApiProperty({ example: 650.5, description: 'XRP 평균 매수가 (원)' })
-  averagePrice: number;
+  @ApiProperty({ example: '650.50', description: 'XRP 평균 매수가 (원)' })
+  averagePrice: string;
 
   @ApiProperty({
-    example: 650623.45,
+    example: '650623.45',
     description: '총 투자 금액 (원)',
   })
-  totalInvested: number;
+  totalInvested: string;
 
   @ApiProperty({
     example: '첫 번째 XRP 매수',
@@ -28,13 +28,13 @@ export class XrpHoldingDto {
     example: '2024-01-01T00:00:00.000Z',
     description: '생성일',
   })
-  createdAt: Date;
+  createdAt: string;
 
   @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',
     description: '수정일',
   })
-  updatedAt: Date;
+  updatedAt: string;
 }
 
 export class XrpHoldingPaginatedResultDto {

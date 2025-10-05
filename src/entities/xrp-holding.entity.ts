@@ -4,7 +4,8 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -23,7 +24,7 @@ export class XrpHolding {
   totalInvested: number;
 
   @Column({ nullable: true })
-  memo: string;
+  memo: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -31,6 +32,7 @@ export class XrpHolding {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.xrpHoldings)
+  @OneToOne(() => User, (user) => user.xrpHolding)
+  @JoinColumn()
   user: User;
 }

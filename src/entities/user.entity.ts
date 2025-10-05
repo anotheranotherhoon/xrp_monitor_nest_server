@@ -4,7 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { XrpHolding } from './xrp-holding.entity';
 
@@ -25,12 +25,15 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ nullable: true })
+  refreshToken: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => XrpHolding, (holding) => holding.user)
-  xrpHoldings: XrpHolding[];
+  @OneToOne(() => XrpHolding, (holding) => holding.user)
+  xrpHolding: XrpHolding;
 }

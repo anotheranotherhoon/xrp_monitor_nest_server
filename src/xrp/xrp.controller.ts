@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Post,
   Put,
   Query,
@@ -14,7 +13,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
 
@@ -23,7 +21,6 @@ import { CreateHoldingDto } from './dto/create-holding.dto';
 import { UpdateHoldingDto } from './dto/update-holding.dto';
 import {
   XrpHoldingDto,
-  XrpHoldingPaginatedResponseDto,
   XrpHoldingSummaryDto,
 } from './dto/holding-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -37,49 +34,40 @@ import { User as UserEntity } from '../entities/user.entity';
 export class XrpController {
   constructor(private readonly xrpService: XrpService) {}
 
-  @Post('holdings')
-  @ApiOperation({ summary: 'XRP 보유 정보 생성' })
+  @Post('holding')
+  @ApiOperation({ summary: 'XRP 보유 정보 생성/수정' })
   @ApiResponse({
     status: 201,
-    description: 'XRP 보유 정보 생성 성공',
+    description: 'XRP 보유 정보 생성/수정 성공',
     type: XrpHoldingDto,
   })
-  async createHolding(
+  async createOrUpdateHolding(
     @User() user: UserEntity,
     @Body() createHoldingDto: CreateHoldingDto,
-  ): Promise<XrpHoldingDto> {
-    return this.xrpService.createHolding(user, createHoldingDto);
+  ): Promise<{ data: XrpHoldingDto }> {
+    const holding = await this.xrpService.createOrUpdateHolding(
+      user,
+      createHoldingDto,
+    );
+    return { data: holding };
   }
 
-  @Get('holdings')
-  @ApiOperation({ summary: 'XRP 보유 정보 목록 조회' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    example: 1,
-    description: '페이지 번호',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    example: 10,
-    description: '페이지당 항목 수',
-  })
+  @Get('holding')
+  @ApiOperation({ summary: 'XRP 보유 정보 조회' })
   @ApiResponse({
     status: 200,
-    description: 'XRP 보유 정보 목록 조회 성공',
-    type: XrpHoldingPaginatedResponseDto,
+    description: 'XRP 보유 정보 조회 성공',
+    type: XrpHoldingDto,
   })
-  async getHoldings(
+  @ApiResponse({ status: 404, description: '보유 정보가 없음' })
+  async getUserHolding(
     @User() user: UserEntity,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    const result = await this.xrpService.getHoldings(user.id, +page, +limit);
-    return { result };
+  ): Promise<{ data: XrpHoldingDto | null }> {
+    const holding = await this.xrpService.getUserHolding(user.id);
+    return { data: holding };
   }
 
-  @Get('holdings/summary')
+  @Get('holding/summary')
   @ApiOperation({ summary: 'XRP 보유 요약 정보' })
   @ApiQuery({
     name: 'currentPrice',
@@ -102,52 +90,32 @@ export class XrpController {
     );
   }
 
-  @Get('holdings/:id')
-  @ApiOperation({ summary: 'XRP 보유 정보 단일 조회' })
-  @ApiParam({ name: 'id', example: 1, description: '보유 정보 ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'XRP 보유 정보 조회 성공',
-    type: XrpHoldingDto,
-  })
-  @ApiResponse({ status: 404, description: '보유 정보를 찾을 수 없음' })
-  async getHolding(
-    @User() user: UserEntity,
-    @Param('id') id: number,
-  ): Promise<XrpHoldingDto> {
-    return this.xrpService.getHolding(user.id, +id);
-  }
-
-  @Put('holdings/:id')
+  @Put('holding')
   @ApiOperation({ summary: 'XRP 보유 정보 수정' })
-  @ApiParam({ name: 'id', example: 1, description: '보유 정보 ID' })
   @ApiResponse({
     status: 200,
     description: 'XRP 보유 정보 수정 성공',
     type: XrpHoldingDto,
   })
   @ApiResponse({ status: 404, description: '보유 정보를 찾을 수 없음' })
-  async updateHolding(
+  async updateUserHolding(
     @User() user: UserEntity,
-    @Param('id') id: number,
     @Body() updateHoldingDto: UpdateHoldingDto,
   ): Promise<XrpHoldingDto> {
-    return this.xrpService.updateHolding(user.id, +id, updateHoldingDto);
+    return this.xrpService.updateUserHolding(user.id, updateHoldingDto);
   }
 
-  @Delete('holdings/:id')
+  @Delete('holding')
   @ApiOperation({ summary: 'XRP 보유 정보 삭제' })
-  @ApiParam({ name: 'id', example: 1, description: '보유 정보 ID' })
   @ApiResponse({
     status: 200,
     description: 'XRP 보유 정보 삭제 성공',
   })
   @ApiResponse({ status: 404, description: '보유 정보를 찾을 수 없음' })
-  async deleteHolding(
+  async deleteUserHolding(
     @User() user: UserEntity,
-    @Param('id') id: number,
   ): Promise<{ message: string }> {
-    await this.xrpService.deleteHolding(user.id, +id);
+    await this.xrpService.deleteUserHolding(user.id);
     return { message: 'XRP 보유 정보가 삭제되었습니다.' };
   }
 }

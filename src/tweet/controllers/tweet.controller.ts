@@ -13,11 +13,9 @@ import {
   TweetPaginatedResponseDto,
   TweetPaginatedResultDto,
 } from '../dto/tweet-paginated-response.dto';
-import { Public } from '../../auth/decorators/public.decorator';
 
 @ApiTags('🐦tweet')
 @Controller('tweet')
-@Public()
 export class TweetController {
   constructor(private readonly tweetService: TweetService) {}
 

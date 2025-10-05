@@ -8,7 +8,6 @@ import { CreateHoldingDto } from './dto/create-holding.dto';
 import { UpdateHoldingDto } from './dto/update-holding.dto';
 import {
   XrpHoldingDto,
-  XrpHoldingPaginatedResultDto,
   XrpHoldingSummaryDto,
 } from './dto/holding-response.dto';
 
@@ -19,7 +18,7 @@ export class XrpService {
     private holdingRepository: Repository<XrpHolding>,
   ) {}
 
-  async createHolding(
+  async createOrUpdateHolding(
     user: User,
     createHoldingDto: CreateHoldingDto,
   ): Promise<XrpHoldingDto> {
@@ -27,92 +26,67 @@ export class XrpService {
 
     const totalInvested = quantity * averagePrice;
 
-    const holding = this.holdingRepository.create({
-      user,
-      quantity,
-      averagePrice,
-      totalInvested,
-      memo,
+    // 기존 보유정보가 있는지 확인
+    let holding = await this.holdingRepository.findOne({
+      where: { user: { id: user.id } },
     });
+
+    if (holding) {
+      // 기존 보유정보 업데이트
+      holding.quantity = quantity;
+      holding.averagePrice = averagePrice;
+      holding.totalInvested = totalInvested;
+      holding.memo = memo;
+    } else {
+      // 새 보유정보 생성
+      holding = this.holdingRepository.create({
+        user,
+        quantity,
+        averagePrice,
+        totalInvested,
+        memo,
+      });
+    }
 
     const savedHolding = await this.holdingRepository.save(holding);
 
     return {
       id: savedHolding.id,
-      quantity: savedHolding.quantity,
-      averagePrice: savedHolding.averagePrice,
-      totalInvested: savedHolding.totalInvested,
+      quantity: savedHolding.quantity.toString(),
+      averagePrice: savedHolding.averagePrice.toString(),
+      totalInvested: savedHolding.totalInvested.toString(),
       memo: savedHolding.memo,
-      createdAt: savedHolding.createdAt,
-      updatedAt: savedHolding.updatedAt,
+      createdAt: savedHolding.createdAt.toISOString(),
+      updatedAt: savedHolding.updatedAt.toISOString(),
     };
   }
 
-  async getHoldings(
-    userId: number,
-    page: number = 1,
-    limit: number = 10,
-  ): Promise<XrpHoldingPaginatedResultDto> {
-    const offset = (page - 1) * limit;
-
-    const [holdings, total] = await this.holdingRepository.findAndCount({
-      where: { user: { id: userId } },
-      order: { createdAt: 'DESC' },
-      skip: offset,
-      take: limit,
-    });
-
-    const lastPage = Math.ceil(total / limit);
-
-    const list: XrpHoldingDto[] = holdings.map((holding) => ({
-      id: holding.id,
-      quantity: holding.quantity,
-      averagePrice: holding.averagePrice,
-      totalInvested: holding.totalInvested,
-      memo: holding.memo,
-      createdAt: holding.createdAt,
-      updatedAt: holding.updatedAt,
-    }));
-
-    return {
-      nextCursor: page < lastPage ? page + 1 : null,
-      page: {
-        total,
-        perPage: limit,
-        currentPage: page,
-        lastPage,
-      },
-      list,
-    };
-  }
-
-  async getHolding(userId: number, holdingId: number): Promise<XrpHoldingDto> {
+  async getUserHolding(userId: number): Promise<XrpHoldingDto | null> {
     const holding = await this.holdingRepository.findOne({
-      where: { id: holdingId, user: { id: userId } },
+      where: { user: { id: userId } },
     });
 
     if (!holding) {
-      throw new NotFoundException('보유 정보를 찾을 수 없습니다.');
+      return null;
     }
 
     return {
       id: holding.id,
-      quantity: holding.quantity,
-      averagePrice: holding.averagePrice,
-      totalInvested: holding.totalInvested,
+      quantity: holding.quantity.toString(),
+      averagePrice: holding.averagePrice.toString(),
+      totalInvested: holding.totalInvested.toString(),
       memo: holding.memo,
-      createdAt: holding.createdAt,
-      updatedAt: holding.updatedAt,
+      createdAt: holding.createdAt.toISOString(),
+      updatedAt: holding.updatedAt.toISOString(),
     };
   }
 
-  async updateHolding(
+  async updateUserHolding(
     userId: number,
-    holdingId: number,
     updateHoldingDto: UpdateHoldingDto,
   ): Promise<XrpHoldingDto> {
     const holding = await this.holdingRepository.findOne({
-      where: { id: holdingId, user: { id: userId } },
+      where: { user: { id: userId } },
     });
 
     if (!holding) {
@@ -137,18 +111,18 @@ export class XrpService {
 
     return {
       id: savedHolding.id,
-      quantity: savedHolding.quantity,
-      averagePrice: savedHolding.averagePrice,
-      totalInvested: savedHolding.totalInvested,
+      quantity: savedHolding.quantity.toString(),
+      averagePrice: savedHolding.averagePrice.toString(),
+      totalInvested: savedHolding.totalInvested.toString(),
       memo: savedHolding.memo,
-      createdAt: savedHolding.createdAt,
-      updatedAt: savedHolding.updatedAt,
+      createdAt: savedHolding.createdAt.toISOString(),
+      updatedAt: savedHolding.updatedAt.toISOString(),
     };
   }
 
-  async deleteHolding(userId: number, holdingId: number): Promise<void> {
+  async deleteUserHolding(userId: number): Promise<void> {
     const holding = await this.holdingRepository.findOne({
-      where: { id: holdingId, user: { id: userId } },
+      where: { user: { id: userId } },
     });
 
     if (!holding) {
@@ -162,11 +136,11 @@ export class XrpService {
     userId: number,
     currentXrpPrice?: number,
   ): Promise<XrpHoldingSummaryDto> {
-    const holdings = await this.holdingRepository.find({
+    const holding = await this.holdingRepository.findOne({
       where: { user: { id: userId } },
     });
 
-    if (holdings.length === 0) {
+    if (!holding) {
       return {
         totalQuantity: 0,
         overallAveragePrice: 0,
@@ -178,24 +152,20 @@ export class XrpService {
       };
     }
 
-    const totalQuantity = holdings.reduce((sum, h) => sum + h.quantity, 0);
-    const totalInvested = holdings.reduce((sum, h) => sum + h.totalInvested, 0);
-    const overallAveragePrice = totalInvested / totalQuantity;
-
     let totalProfitLoss: number | null = null;
     let profitLossRate: number | null = null;
 
     if (currentXrpPrice) {
-      const currentValue = totalQuantity * currentXrpPrice;
-      totalProfitLoss = currentValue - totalInvested;
-      profitLossRate = (totalProfitLoss / totalInvested) * 100;
+      const currentValue = holding.quantity * currentXrpPrice;
+      totalProfitLoss = currentValue - holding.totalInvested;
+      profitLossRate = (totalProfitLoss / holding.totalInvested) * 100;
     }
 
     return {
-      totalQuantity,
-      overallAveragePrice,
-      totalInvested,
-      holdingsCount: holdings.length,
+      totalQuantity: holding.quantity,
+      overallAveragePrice: holding.averagePrice,
+      totalInvested: holding.totalInvested,
+      holdingsCount: 1,
       currentPrice: currentXrpPrice || null,
       totalProfitLoss,
       profitLossRate,
