@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { randomBytes } from 'crypto';
 
 import { User } from '../entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
@@ -21,6 +22,10 @@ export class AuthService {
     private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
+
+  private generateRefreshToken(): string {
+    return randomBytes(32).toString('hex');
+  }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const { email, password, nickname } = registerDto;
@@ -46,13 +51,19 @@ export class AuthService {
 
     const savedUser = await this.userRepository.save(user);
 
-    // JWT 토큰 생성
+    // JWT 토큰 및 RefreshToken 생성
     const payload = { sub: savedUser.id, email: savedUser.email };
     const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.generateRefreshToken();
+
+    // RefreshToken 저장
+    savedUser.refreshToken = refreshToken;
+    await this.userRepository.save(savedUser);
 
     return {
       data: {
         accessToken,
+        refreshToken,
         user: {
           id: savedUser.id,
           email: savedUser.email,
@@ -82,13 +93,19 @@ export class AuthService {
       throw new UnauthorizedException('이메일 또는 비밀번호가 잘못되었습니다.');
     }
 
-    // JWT 토큰 생성
+    // JWT 토큰 및 RefreshToken 생성
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.generateRefreshToken();
+
+    // RefreshToken 저장
+    user.refreshToken = refreshToken;
+    await this.userRepository.save(user);
 
     return {
       data: {
         accessToken,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
@@ -120,5 +137,41 @@ export class AuthService {
       nickname: user.nickname,
       createdAt: user.createdAt,
     };
+  }
+
+  async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
+    const user = await this.userRepository.findOne({
+      where: { refreshToken, isActive: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+    // 새로운 토큰들 생성
+    const payload = { sub: user.id, email: user.email };
+    const accessToken = this.jwtService.sign(payload);
+    const newRefreshToken = this.generateRefreshToken();
+
+    // 새로운 RefreshToken 저장
+    user.refreshToken = newRefreshToken;
+    await this.userRepository.save(user);
+
+    return {
+      data: {
+        accessToken,
+        refreshToken: newRefreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          nickname: user.nickname,
+          createdAt: user.createdAt,
+        },
+      },
+    };
+  }
+
+  async logout(userId: number): Promise<void> {
+    await this.userRepository.update(userId, { refreshToken: null });
   }
 }

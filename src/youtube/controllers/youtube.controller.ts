@@ -12,11 +12,9 @@ import {
   YoutubePaginatedResponseDto,
   YoutubePaginatedResultDto,
 } from '../dto/youtube-paginated-response.dto';
-import { Public } from '../../auth/decorators/public.decorator';
 
 @ApiTags('▶️youtube')
 @Controller('youtube')
-@Public()
 export class YoutubeController {
   constructor(private readonly youtubeService: YoutubeService) {}
 

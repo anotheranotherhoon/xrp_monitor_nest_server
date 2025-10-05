@@ -4,11 +4,9 @@ import {
   UpbitPaginatedResponseDto,
   UpbitPaginatedResultDto,
 } from '../dto/upbit-paginated-response.dto';
-import { Public } from '../../auth/decorators/public.decorator';
 
 @ApiTags('💹upbit')
 @Controller('upbit')
-@Public()
 export class UpbitController {
   @Get('socket-docs')
   @ApiOkResponse({

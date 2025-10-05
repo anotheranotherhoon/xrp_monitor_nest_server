@@ -22,6 +22,7 @@ import {
   LogoutResponseDto,
   UserDto,
 } from './dto/auth-response.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from './decorators/public.decorator';
 import { User } from './decorators/user.decorator';
 import { User as UserEntity } from '../entities/user.entity';
@@ -59,6 +60,22 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Public()
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '토큰 갱신' })
+  @ApiResponse({
+    status: 200,
+    description: '토큰 갱신 성공',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 401, description: '유효하지 않은 리프레시 토큰' })
+  async refresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<AuthResponseDto> {
+    return this.authService.refreshToken(refreshTokenDto.refreshToken);
+  }
+
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
@@ -69,9 +86,8 @@ export class AuthController {
     description: '로그아웃 성공',
     type: LogoutResponseDto,
   })
-  async logout(): Promise<LogoutResponseDto> {
-    // JWT는 stateless이므로 서버에서 별도 처리 불필요
-    // 클라이언트에서 토큰 삭제 처리
+  async logout(@User() user: UserEntity): Promise<LogoutResponseDto> {
+    await this.authService.logout(user.id);
     return {
       message: '로그아웃이 성공적으로 처리되었습니다.',
     };
