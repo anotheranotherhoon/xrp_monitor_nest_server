@@ -18,6 +18,21 @@ import {
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
+  private formatToKoreanTime(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const koreanTime = new Date(
+      date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+    const year = koreanTime.getFullYear();
+    const month = String(koreanTime.getMonth() + 1).padStart(2, '0');
+    const day = String(koreanTime.getDate()).padStart(2, '0');
+    const hours = String(koreanTime.getHours()).padStart(2, '0');
+    const minutes = String(koreanTime.getMinutes()).padStart(2, '0');
+    const seconds = String(koreanTime.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
   @Get('xrp/cursor')
   @ApiOkResponse({
     type: NewsPaginatedResponseDto,
@@ -75,7 +90,7 @@ export class NewsController {
         neOriginalLink: item.originallink,
         neLink: item.link,
         neDescription: item.description,
-        neCreatedAt: item.pubDate,
+        neCreatedAt: this.formatToKoreanTime(item.pubDate),
       }));
 
       return {
@@ -131,7 +146,7 @@ export class NewsController {
         neOriginalLink: item.originallink,
         neLink: item.link,
         neDescription: item.description,
-        neCreatedAt: item.pubDate,
+        neCreatedAt: this.formatToKoreanTime(item.pubDate),
       }));
 
       return {

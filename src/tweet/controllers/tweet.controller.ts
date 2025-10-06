@@ -19,6 +19,21 @@ import {
 export class TweetController {
   constructor(private readonly tweetService: TweetService) {}
 
+  private formatToKoreanTime(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const koreanTime = new Date(
+      date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+    const year = koreanTime.getFullYear();
+    const month = String(koreanTime.getMonth() + 1).padStart(2, '0');
+    const day = String(koreanTime.getDate()).padStart(2, '0');
+    const hours = String(koreanTime.getHours()).padStart(2, '0');
+    const minutes = String(koreanTime.getMinutes()).padStart(2, '0');
+    const seconds = String(koreanTime.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
   @Get('users/:id/tweets')
   @ApiParam({ name: 'id', example: '25073877', description: 'Twitter user id' })
   @ApiQuery({ name: 'max_results', required: false, example: 10 })
@@ -40,7 +55,7 @@ export class TweetController {
       const items: TweetItemDto[] = (raw?.data || []).map((it: any) => ({
         twId: it?.id,
         twText: it?.text,
-        twCreatedAt: it?.created_at,
+        twCreatedAt: this.formatToKoreanTime(it?.created_at),
         twAuthorId: it?.author_id,
         twLang: it?.lang,
       }));
@@ -98,7 +113,7 @@ export class TweetController {
       const items: TweetItemDto[] = (raw?.data || []).map((it: any) => ({
         twId: it?.id,
         twText: it?.text,
-        twCreatedAt: it?.created_at,
+        twCreatedAt: this.formatToKoreanTime(it?.created_at),
         twAuthorId: it?.author_id,
         twLang: it?.lang,
       }));
