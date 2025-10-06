@@ -18,6 +18,21 @@ import {
 export class YoutubeController {
   constructor(private readonly youtubeService: YoutubeService) {}
 
+  private formatToKoreanTime(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const koreanTime = new Date(
+      date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+    const year = koreanTime.getFullYear();
+    const month = String(koreanTime.getMonth() + 1).padStart(2, '0');
+    const day = String(koreanTime.getDate()).padStart(2, '0');
+    const hours = String(koreanTime.getHours()).padStart(2, '0');
+    const minutes = String(koreanTime.getMinutes()).padStart(2, '0');
+    const seconds = String(koreanTime.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
   @Get('search')
   @ApiOkResponse({
     type: YoutubePaginatedResponseDto,
@@ -76,7 +91,7 @@ export class YoutubeController {
           yoVideoId: it?.id?.videoId,
           yoTitle: it?.snippet?.title,
           yoDescription: it?.snippet?.description,
-          yoCreatedAt: it?.snippet?.publishedAt,
+          yoCreatedAt: this.formatToKoreanTime(it?.snippet?.publishedAt),
           yoChannelId: it?.snippet?.channelId,
           yoChannelTitle: it?.snippet?.channelTitle,
           thumbnails: it?.snippet?.thumbnails,
