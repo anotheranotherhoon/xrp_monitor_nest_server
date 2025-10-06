@@ -33,17 +33,25 @@ export class VersionService {
         latestVersion: currentVersion,
         minimumVersion: currentVersion,
         needsUpdate: false,
-        forceUpdate: false,
+        appStatus: 1,
         downloadUrl: null,
+        apiDomain: null,
         releaseNotes: null,
       };
     }
 
     const needsUpdate = semver.gt(latestVersion.version, currentVersion);
-    const forceUpdate =
+
+    // 앱 상태 결정 로직
+    let appStatus = latestVersion.appStatus;
+    if (
+      appStatus === 1 &&
       needsUpdate &&
-      (latestVersion.forceUpdate ||
-        semver.lt(currentVersion, latestVersion.minimumVersion));
+      semver.lt(currentVersion, latestVersion.minimumVersion)
+    ) {
+      // 최소 버전 미만인 경우 강제 업데이트
+      appStatus = 2;
+    }
 
     let releaseNotes: string[] | null = null;
     if (latestVersion.releaseNotes) {
@@ -60,8 +68,9 @@ export class VersionService {
       latestVersion: latestVersion.version,
       minimumVersion: latestVersion.minimumVersion,
       needsUpdate,
-      forceUpdate,
+      appStatus,
       downloadUrl: latestVersion.downloadUrl,
+      apiDomain: latestVersion.apiDomain,
       releaseNotes,
     };
   }

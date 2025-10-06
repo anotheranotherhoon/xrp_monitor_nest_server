@@ -19,7 +19,6 @@ import {
 } from '@nestjs/swagger';
 
 import { VersionService } from './version.service';
-import { CheckVersionDto } from './dto/check-version.dto';
 import {
   VersionCheckResponseDto,
   CreateVersionDto,
@@ -34,17 +33,32 @@ export class VersionController {
   constructor(private readonly versionService: VersionService) {}
 
   @Public()
-  @Post('check')
+  @Get('check')
   @ApiOperation({ summary: '앱 버전 체크' })
+  @ApiQuery({
+    name: 'currentVersion',
+    example: '1.0.0',
+    description: '현재 앱 버전',
+  })
+  @ApiQuery({
+    name: 'platform',
+    example: 'ios',
+    description: '플랫폼 (ios, android, web)',
+  })
   @ApiResponse({
     status: 200,
     description: '버전 체크 결과',
     type: VersionCheckResponseDto,
   })
   async checkVersion(
-    @Body() checkVersionDto: CheckVersionDto,
-  ): Promise<VersionCheckResponseDto> {
-    return this.versionService.checkVersion(checkVersionDto);
+    @Query('currentVersion') currentVersion: string,
+    @Query('platform') platform: string,
+  ): Promise<{ data: VersionCheckResponseDto }> {
+    const data = await this.versionService.checkVersion({
+      currentVersion,
+      platform,
+    });
+    return { data };
   }
 
   @Post('admin/versions')
