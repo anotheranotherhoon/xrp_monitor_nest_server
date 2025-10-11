@@ -56,9 +56,9 @@ export class AdminService {
   ): Promise<{ users: User[]; total: number; page: number; limit: number }> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
-    if (role) {
-      queryBuilder.where('user.role = :role', { role });
-    }
+    // 기본적으로 USER 역할만 조회, role 파라미터가 있으면 해당 역할 조회
+    const targetRole = role || UserRole.USER;
+    queryBuilder.where('user.role = :role', { role: targetRole });
 
     const [users, total] = await queryBuilder
       .orderBy('user.createdAt', 'DESC')

@@ -14,8 +14,9 @@ import { AuthModule } from './auth/auth.module';
 import { XrpModule } from './xrp/xrp.module';
 import { VersionModule } from './version/version.module';
 import { AdminModule } from './admin/admin.module';
+import { KeywordModule } from './keyword/keyword.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { User, XrpHolding, AppVersion } from './entities';
+import { User, XrpHolding, AppVersion, Keyword } from './entities';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { User, XrpHolding, AppVersion } from './entities';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_DATABASE || 'xrp',
-      entities: [User, XrpHolding, AppVersion],
+      entities: [User, XrpHolding, AppVersion, Keyword],
       synchronize: process.env.NODE_ENV !== 'production',
       ssl: process.env.NODE_ENV === 'production',
     }),
@@ -43,6 +44,7 @@ import { User, XrpHolding, AppVersion } from './entities';
     XrpModule,
     VersionModule,
     AdminModule,
+    KeywordModule,
   ],
   controllers: [AppController],
   providers: [
