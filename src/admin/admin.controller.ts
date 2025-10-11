@@ -42,7 +42,7 @@ export class AdminController {
   @Get('users')
   @Admin()
   @ApiBearerAuth()
-  @ApiOperation({ summary: '사용자 목록 조회' })
+  @ApiOperation({ summary: '사용자 목록 조회 (기본값: USER 역할만)' })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -59,7 +59,8 @@ export class AdminController {
     name: 'role',
     required: false,
     example: 'USER',
-    description: '사용자 권한 필터',
+    description:
+      '사용자 권한 필터 (기본값: USER, ADMIN/SUPER_ADMIN도 조회 가능)',
   })
   @ApiResponse({
     status: 200,
