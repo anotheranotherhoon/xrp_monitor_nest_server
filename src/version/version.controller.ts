@@ -7,7 +7,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,7 +23,7 @@ import {
   CreateVersionDto,
 } from './dto/version-response.dto';
 import { Public } from '../auth/decorators/public.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Admin } from '../auth/decorators/admin.decorator';
 import { AppVersion } from '../entities/app-version.entity';
 
 @ApiTags('📱 버전 관리')
@@ -62,7 +61,7 @@ export class VersionController {
   }
 
   @Post('admin/versions')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '새 버전 등록 (관리자용)' })
   @ApiResponse({
@@ -77,7 +76,7 @@ export class VersionController {
   }
 
   @Get('admin/versions')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '등록된 버전 목록 조회 (관리자용)' })
   @ApiQuery({
@@ -98,7 +97,7 @@ export class VersionController {
   }
 
   @Put('admin/versions/:id')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '버전 정보 수정 (관리자용)' })
   @ApiParam({ name: 'id', example: 1, description: '버전 ID' })
@@ -115,7 +114,7 @@ export class VersionController {
   }
 
   @Delete('admin/versions/:id')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '버전 정보 삭제 (관리자용)' })
   @ApiParam({ name: 'id', example: 1, description: '버전 ID' })
@@ -129,7 +128,7 @@ export class VersionController {
   }
 
   @Put('admin/versions/:id/toggle')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '버전 활성화/비활성화 토글 (관리자용)' })
   @ApiParam({ name: 'id', example: 1, description: '버전 ID' })

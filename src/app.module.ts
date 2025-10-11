@@ -13,6 +13,7 @@ import { UpbitModule } from './upbit/upbit.module';
 import { AuthModule } from './auth/auth.module';
 import { XrpModule } from './xrp/xrp.module';
 import { VersionModule } from './version/version.module';
+import { AdminModule } from './admin/admin.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { User, XrpHolding, AppVersion } from './entities';
 
@@ -41,6 +42,7 @@ import { User, XrpHolding, AppVersion } from './entities';
     UpbitModule,
     XrpModule,
     VersionModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

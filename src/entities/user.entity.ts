@@ -8,6 +8,12 @@ import {
 } from 'typeorm';
 import { XrpHolding } from './xrp-holding.entity';
 
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+  SUPER_ADMIN = 'SUPER_ADMIN',
+}
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -24,6 +30,13 @@ export class User {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @Column({ nullable: true })
   refreshToken: string;
