@@ -7,7 +7,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,13 +18,12 @@ import {
 } from '@nestjs/swagger';
 
 import { VersionService } from './version.service';
-import { CheckVersionDto } from './dto/check-version.dto';
 import {
   VersionCheckResponseDto,
   CreateVersionDto,
 } from './dto/version-response.dto';
 import { Public } from '../auth/decorators/public.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Admin } from '../auth/decorators/admin.decorator';
 import { AppVersion } from '../entities/app-version.entity';
 
 @ApiTags('📱 버전 관리')
@@ -34,21 +32,36 @@ export class VersionController {
   constructor(private readonly versionService: VersionService) {}
 
   @Public()
-  @Post('check')
+  @Get('check')
   @ApiOperation({ summary: '앱 버전 체크' })
+  @ApiQuery({
+    name: 'currentVersion',
+    example: '1.0.0',
+    description: '현재 앱 버전',
+  })
+  @ApiQuery({
+    name: 'platform',
+    example: 'ios',
+    description: '플랫폼 (ios, android, web)',
+  })
   @ApiResponse({
     status: 200,
     description: '버전 체크 결과',
     type: VersionCheckResponseDto,
   })
   async checkVersion(
-    @Body() checkVersionDto: CheckVersionDto,
-  ): Promise<VersionCheckResponseDto> {
-    return this.versionService.checkVersion(checkVersionDto);
+    @Query('currentVersion') currentVersion: string,
+    @Query('platform') platform: string,
+  ): Promise<{ data: VersionCheckResponseDto }> {
+    const data = await this.versionService.checkVersion({
+      currentVersion,
+      platform,
+    });
+    return { data };
   }
 
   @Post('admin/versions')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '새 버전 등록 (관리자용)' })
   @ApiResponse({
@@ -63,7 +76,7 @@ export class VersionController {
   }
 
   @Get('admin/versions')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '등록된 버전 목록 조회 (관리자용)' })
   @ApiQuery({
@@ -84,7 +97,7 @@ export class VersionController {
   }
 
   @Put('admin/versions/:id')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '버전 정보 수정 (관리자용)' })
   @ApiParam({ name: 'id', example: 1, description: '버전 ID' })
@@ -101,7 +114,7 @@ export class VersionController {
   }
 
   @Delete('admin/versions/:id')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '버전 정보 삭제 (관리자용)' })
   @ApiParam({ name: 'id', example: 1, description: '버전 ID' })
@@ -115,7 +128,7 @@ export class VersionController {
   }
 
   @Put('admin/versions/:id/toggle')
-  @UseGuards(JwtAuthGuard)
+  @Admin()
   @ApiBearerAuth()
   @ApiOperation({ summary: '버전 활성화/비활성화 토글 (관리자용)' })
   @ApiParam({ name: 'id', example: 1, description: '버전 ID' })

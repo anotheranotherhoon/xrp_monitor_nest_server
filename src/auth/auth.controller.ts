@@ -25,8 +25,10 @@ import {
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from './decorators/public.decorator';
 import { User } from './decorators/user.decorator';
+import { SuperAdmin } from './decorators/admin.decorator';
 import { User as UserEntity } from '../entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CreateAdminDto } from './dto/create-admin.dto';
 
 @ApiTags('🔐 인증')
 @Controller('auth')
@@ -104,5 +106,21 @@ export class AuthController {
   })
   async getProfile(@User() user: UserEntity): Promise<UserDto> {
     return this.authService.getUserProfile(user.id);
+  }
+
+  @Post('admin/create')
+  @SuperAdmin()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '관리자 계정 생성 (슈퍼관리자용)' })
+  @ApiResponse({
+    status: 201,
+    description: '관리자 계정 생성 성공',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 409, description: '이미 사용 중인 이메일' })
+  async createAdmin(
+    @Body() createAdminDto: CreateAdminDto,
+  ): Promise<AuthResponseDto> {
+    return this.authService.createAdmin(createAdminDto);
   }
 }

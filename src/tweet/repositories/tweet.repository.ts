@@ -12,6 +12,7 @@ export class TweetRepository {
     const response$ = this.httpService.get(url, {
       params: {
         max_results: maxResults,
+        'tweet.fields': 'created_at,author_id,lang',
       },
     });
     const { data } = await firstValueFrom(response$);
@@ -30,6 +31,7 @@ export class TweetRepository {
         query,
         max_results: maxResults,
         next_token: nextToken,
+        'tweet.fields': 'created_at,author_id,lang',
       },
     });
     const { data } = await firstValueFrom(response$);

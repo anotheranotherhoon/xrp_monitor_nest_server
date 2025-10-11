@@ -14,6 +14,7 @@ import { User } from '../entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto, UserDto } from './dto/auth-response.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 
 @Injectable()
 export class AuthService {
@@ -52,7 +53,11 @@ export class AuthService {
     const savedUser = await this.userRepository.save(user);
 
     // JWT 토큰 및 RefreshToken 생성
-    const payload = { sub: savedUser.id, email: savedUser.email };
+    const payload = {
+      sub: savedUser.id,
+      email: savedUser.email,
+      role: savedUser.role,
+    };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.generateRefreshToken();
 
@@ -68,6 +73,7 @@ export class AuthService {
           id: savedUser.id,
           email: savedUser.email,
           nickname: savedUser.nickname,
+          role: savedUser.role,
           createdAt: savedUser.createdAt,
         },
       },
@@ -94,7 +100,7 @@ export class AuthService {
     }
 
     // JWT 토큰 및 RefreshToken 생성
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.generateRefreshToken();
 
@@ -110,6 +116,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           nickname: user.nickname,
+          role: user.role,
           createdAt: user.createdAt,
         },
       },
@@ -135,6 +142,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       nickname: user.nickname,
+      role: user.role,
       createdAt: user.createdAt,
     };
   }
@@ -149,7 +157,7 @@ export class AuthService {
     }
 
     // 새로운 토큰들 생성
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload);
     const newRefreshToken = this.generateRefreshToken();
 
@@ -165,6 +173,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           nickname: user.nickname,
+          role: user.role,
           createdAt: user.createdAt,
         },
       },
@@ -173,5 +182,58 @@ export class AuthService {
 
   async logout(userId: number): Promise<void> {
     await this.userRepository.update(userId, { refreshToken: null });
+  }
+
+  async createAdmin(createAdminDto: CreateAdminDto): Promise<AuthResponseDto> {
+    const { email, password, nickname, role } = createAdminDto;
+
+    // 이메일 중복 체크
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('이미 사용 중인 이메일입니다.');
+    }
+
+    // 비밀번호 해시화
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // 관리자 사용자 생성
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      nickname,
+      role,
+    });
+
+    const savedUser = await this.userRepository.save(user);
+
+    // JWT 토큰 및 RefreshToken 생성
+    const payload = {
+      sub: savedUser.id,
+      email: savedUser.email,
+      role: savedUser.role,
+    };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.generateRefreshToken();
+
+    // RefreshToken 저장
+    savedUser.refreshToken = refreshToken;
+    await this.userRepository.save(savedUser);
+
+    return {
+      data: {
+        accessToken,
+        refreshToken,
+        user: {
+          id: savedUser.id,
+          email: savedUser.email,
+          nickname: savedUser.nickname,
+          role: savedUser.role,
+          createdAt: savedUser.createdAt,
+        },
+      },
+    };
   }
 }

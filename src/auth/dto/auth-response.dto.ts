@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '../../entities/user.entity';
 
 export class UserDto {
   @ApiProperty({ example: 1, description: '사용자 ID' })
@@ -13,6 +14,13 @@ export class UserDto {
     nullable: true,
   })
   nickname: string | null;
+
+  @ApiProperty({
+    example: 'USER',
+    description: '사용자 권한',
+    enum: UserRole,
+  })
+  role: UserRole;
 
   @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',

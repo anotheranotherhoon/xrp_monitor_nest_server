@@ -20,14 +20,17 @@ export class AppVersion {
   @Column()
   minimumVersion: string;
 
-  @Column({ default: false })
-  forceUpdate: boolean;
+  @Column({ default: 1 })
+  appStatus: number; // 1: 정상, 2: 강제업데이트, 3: 점검중
 
   @Column({ type: 'text', nullable: true })
   releaseNotes: string;
 
   @Column({ nullable: true })
   downloadUrl: string;
+
+  @Column({ nullable: true })
+  apiDomain: string;
 
   @Column({ default: true })
   isActive: boolean;

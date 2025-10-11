@@ -35,7 +35,9 @@
     "generate": "node tools/generate.js",
     "rename": "node tools/rename.js",
     "git-reset": "node tools/git-reset.js",
-    "husky:setup": "node tools/setup-husky.js"
+    "husky:setup": "node tools/setup-husky.js",
+    "migration:set-user-role": "ts-node -r tsconfig-paths/register src/migrations/set-default-user-role.ts",
+    "create-super-admin": "ts-node -r tsconfig-paths/register src/scripts/create-super-admin.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
