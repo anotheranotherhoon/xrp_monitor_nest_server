@@ -39,8 +39,9 @@ export class KeywordController {
     description: '키워드 목록 조회 성공',
     type: KeywordsResponseDto,
   })
-  async getAllKeywords(): Promise<KeywordsResponseDto> {
-    return this.keywordService.getAllKeywords();
+  async getAllKeywords(): Promise<{ data: KeywordsResponseDto }> {
+    const keywords = await this.keywordService.getAllKeywords();
+    return { data: keywords };
   }
 
   @Public()
@@ -89,11 +90,14 @@ export class KeywordController {
     },
   })
   async getKeywordsForAdmin(): Promise<{
-    positiveKeywords: Keyword[];
-    negativeKeywords: Keyword[];
-    importantKeywords: Keyword[];
+    data: {
+      positiveKeywords: Keyword[];
+      negativeKeywords: Keyword[];
+      importantKeywords: Keyword[];
+    };
   }> {
-    return this.keywordService.getKeywordsForAdmin();
+    const keywords = await this.keywordService.getKeywordsForAdmin();
+    return { data: keywords };
   }
 
   @Get('admin/detail')

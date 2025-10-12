@@ -263,12 +263,10 @@ export class XrpController {
   })
   async getHoldingSummary(
     @User() user: UserEntity,
-    @Query('currentPrice') currentPrice?: number,
+    @Query('currentPrice') currentPrice?: string,
   ): Promise<XrpHoldingSummaryDto> {
-    return this.xrpService.getHoldingSummary(
-      user.meIdx,
-      currentPrice ? +currentPrice : undefined,
-    );
+    const price = currentPrice ? parseFloat(currentPrice) : undefined;
+    return this.xrpService.getHoldingSummary(user.meIdx, price);
   }
 
   @Put('holding')
