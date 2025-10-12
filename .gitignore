@@ -61,6 +61,3 @@ dist/
 build/
 *.log
 .env
-
-
-CLAUDE.md

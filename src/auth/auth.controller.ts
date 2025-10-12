@@ -89,7 +89,7 @@ export class AuthController {
     type: LogoutResponseDto,
   })
   async logout(@User() user: UserEntity): Promise<LogoutResponseDto> {
-    await this.authService.logout(user.id);
+    await this.authService.logout(user.meIdx);
     return {
       message: '로그아웃이 성공적으로 처리되었습니다.',
     };
@@ -105,7 +105,7 @@ export class AuthController {
     type: UserDto,
   })
   async getProfile(@User() user: UserEntity): Promise<UserDto> {
-    return this.authService.getUserProfile(user.id);
+    return this.authService.getUserProfile(user.meIdx);
   }
 
   @Post('admin/create')

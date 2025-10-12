@@ -28,7 +28,7 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('사용자 정보를 찾을 수 없습니다.');
     }
 
-    const hasRole = requiredRoles.some((role) => user.role === role);
+    const hasRole = requiredRoles.some((role) => user.meRole === role);
 
     if (!hasRole) {
       throw new ForbiddenException('이 작업을 수행할 권한이 없습니다.');

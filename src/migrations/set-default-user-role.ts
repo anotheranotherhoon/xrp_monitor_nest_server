@@ -29,8 +29,8 @@ export async function setDefaultUserRole() {
     const result = await userRepository
       .createQueryBuilder()
       .update(User)
-      .set({ role: UserRole.USER })
-      .where('role IS NULL')
+      .set({ meRole: UserRole.USER })
+      .where('meRole IS NULL')
       .execute();
 
     console.log(

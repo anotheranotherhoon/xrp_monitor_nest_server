@@ -8,7 +8,7 @@ export class CreateHoldingDto {
   })
   @IsNumber()
   @Min(0)
-  quantity: number;
+  hoQuantity: number;
 
   @ApiProperty({
     example: 650.5,
@@ -16,14 +16,14 @@ export class CreateHoldingDto {
   })
   @IsNumber()
   @Min(0)
-  averagePrice: number;
+  hoAveragePrice: number;
 
   @ApiProperty({
     example: '첫 번째 XRP 매수',
-    description: '메모 (선택사항)',
+    description: '멤모 (선택사항)',
     required: false,
   })
   @IsOptional()
   @IsString()
-  memo?: string;
+  hoMemo?: string;
 }

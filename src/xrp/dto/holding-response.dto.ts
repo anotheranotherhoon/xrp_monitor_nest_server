@@ -2,27 +2,27 @@ import { ApiProperty } from '@nestjs/swagger';
 import { PageInfoDto } from '../../common/dto/paginated-response.dto';
 
 export class XrpHoldingDto {
-  @ApiProperty({ example: 1, description: '보유 정보 ID' })
-  id: number;
+  @ApiProperty({ example: 1, description: '보유 정보 고유 식별자' })
+  hoIdx: number;
 
   @ApiProperty({ example: '1000.12345600', description: 'XRP 보유 수량' })
-  quantity: string;
+  hoQuantity: string;
 
   @ApiProperty({ example: '650.50', description: 'XRP 평균 매수가 (원)' })
-  averagePrice: string;
+  hoAveragePrice: string;
 
   @ApiProperty({
     example: '650623.45',
     description: '총 투자 금액 (원)',
   })
-  totalInvested: string;
+  hoTotalInvested: string;
 
   @ApiProperty({
     example: '첫 번째 XRP 매수',
     description: '메모',
     nullable: true,
   })
-  memo: string | null;
+  hoMemo: string | null;
 
   @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',

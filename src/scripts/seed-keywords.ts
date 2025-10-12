@@ -33,28 +33,36 @@ async function seedKeywords() {
     // 초기 키워드 데이터
     const initialKeywords = [
       // 긍정적 키워드
-      { keyword: '상승', weight: 1.5, type: KeywordType.POSITIVE },
-      { keyword: '성장', weight: 1.2, type: KeywordType.POSITIVE },
-      { keyword: 'pump', weight: 2.0, type: KeywordType.POSITIVE },
-      { keyword: 'bullish', weight: 1.8, type: KeywordType.POSITIVE },
-      { keyword: '호재', weight: 1.6, type: KeywordType.POSITIVE },
-      { keyword: '급등', weight: 2.2, type: KeywordType.POSITIVE },
+      { keKeyword: '상승', keWeight: 1.5, keType: KeywordType.POSITIVE },
+      { keKeyword: '성장', keWeight: 1.2, keType: KeywordType.POSITIVE },
+      { keKeyword: 'pump', keWeight: 2.0, keType: KeywordType.POSITIVE },
+      { keKeyword: 'bullish', keWeight: 1.8, keType: KeywordType.POSITIVE },
+      { keKeyword: '호재', keWeight: 1.6, keType: KeywordType.POSITIVE },
+      { keKeyword: '급등', keWeight: 2.2, keType: KeywordType.POSITIVE },
 
       // 부정적 키워드
-      { keyword: '하락', weight: 1.5, type: KeywordType.NEGATIVE },
-      { keyword: '급락', weight: 2.0, type: KeywordType.NEGATIVE },
-      { keyword: 'dump', weight: 2.0, type: KeywordType.NEGATIVE },
-      { keyword: 'bearish', weight: 1.8, type: KeywordType.NEGATIVE },
-      { keyword: '악재', weight: 1.6, type: KeywordType.NEGATIVE },
-      { keyword: '폭락', weight: 2.2, type: KeywordType.NEGATIVE },
+      { keKeyword: '하락', keWeight: 1.5, keType: KeywordType.NEGATIVE },
+      { keKeyword: '급락', keWeight: 2.0, keType: KeywordType.NEGATIVE },
+      { keKeyword: 'dump', keWeight: 2.0, keType: KeywordType.NEGATIVE },
+      { keKeyword: 'bearish', keWeight: 1.8, keType: KeywordType.NEGATIVE },
+      { keKeyword: '악재', keWeight: 1.6, keType: KeywordType.NEGATIVE },
+      { keKeyword: '폭락', keWeight: 2.2, keType: KeywordType.NEGATIVE },
 
       // 중요 키워드
-      { keyword: 'xrp', weight: 3.0, type: KeywordType.IMPORTANT },
-      { keyword: 'ripple', weight: 3.0, type: KeywordType.IMPORTANT },
-      { keyword: 'sec', weight: 2.5, type: KeywordType.IMPORTANT },
-      { keyword: 'partnership', weight: 2.0, type: KeywordType.IMPORTANT },
-      { keyword: 'ledger', weight: 2.3, type: KeywordType.IMPORTANT },
-      { keyword: 'cross-border', weight: 2.1, type: KeywordType.IMPORTANT },
+      { keKeyword: 'xrp', keWeight: 3.0, keType: KeywordType.IMPORTANT },
+      { keKeyword: 'ripple', keWeight: 3.0, keType: KeywordType.IMPORTANT },
+      { keKeyword: 'sec', keWeight: 2.5, keType: KeywordType.IMPORTANT },
+      {
+        keKeyword: 'partnership',
+        keWeight: 2.0,
+        keType: KeywordType.IMPORTANT,
+      },
+      { keKeyword: 'ledger', keWeight: 2.3, keType: KeywordType.IMPORTANT },
+      {
+        keKeyword: 'cross-border',
+        keWeight: 2.1,
+        keType: KeywordType.IMPORTANT,
+      },
     ];
 
     // 키워드 생성
@@ -65,13 +73,13 @@ async function seedKeywords() {
     console.log('\n=== 생성된 키워드 ===');
 
     const positiveKeywords = keywords.filter(
-      (k) => k.type === KeywordType.POSITIVE,
+      (k) => k.keType === KeywordType.POSITIVE,
     );
     const negativeKeywords = keywords.filter(
-      (k) => k.type === KeywordType.NEGATIVE,
+      (k) => k.keType === KeywordType.NEGATIVE,
     );
     const importantKeywords = keywords.filter(
-      (k) => k.type === KeywordType.IMPORTANT,
+      (k) => k.keType === KeywordType.IMPORTANT,
     );
 
     console.log(`긍정적 키워드: ${positiveKeywords.length}개`);

@@ -22,6 +22,20 @@ export class AdminService {
     private userRepository: Repository<User>,
   ) {}
 
+  private formatToKoreanTime(date: Date): string {
+    if (!date) return '';
+    const koreanTime = new Date(
+      date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+    const year = koreanTime.getFullYear();
+    const month = String(koreanTime.getMonth() + 1).padStart(2, '0');
+    const day = String(koreanTime.getDate()).padStart(2, '0');
+    const hours = String(koreanTime.getHours()).padStart(2, '0');
+    const minutes = String(koreanTime.getMinutes()).padStart(2, '0');
+    const seconds = String(koreanTime.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
   async getDashboard(): Promise<DashboardDto> {
     const [
       totalUsers,
@@ -32,11 +46,11 @@ export class AdminService {
       userCount,
     ] = await Promise.all([
       this.userRepository.count(),
-      this.userRepository.count({ where: { isActive: true } }),
-      this.userRepository.count({ where: { isActive: false } }),
-      this.userRepository.count({ where: { role: UserRole.ADMIN } }),
-      this.userRepository.count({ where: { role: UserRole.SUPER_ADMIN } }),
-      this.userRepository.count({ where: { role: UserRole.USER } }),
+      this.userRepository.count({ where: { meIsActive: true } }),
+      this.userRepository.count({ where: { meIsActive: false } }),
+      this.userRepository.count({ where: { meRole: UserRole.ADMIN } }),
+      this.userRepository.count({ where: { meRole: UserRole.SUPER_ADMIN } }),
+      this.userRepository.count({ where: { meRole: UserRole.USER } }),
     ]);
 
     return {
@@ -53,30 +67,58 @@ export class AdminService {
     page: number = 1,
     limit: number = 10,
     role?: string,
-  ): Promise<{ users: User[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    page: {
+      total: number;
+      perPage: number;
+      currentPage: number;
+      lastPage: number;
+    };
+    list: any[];
+  }> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     // 기본적으로 USER 역할만 조회, role 파라미터가 있으면 해당 역할 조회
     const targetRole = role || UserRole.USER;
-    queryBuilder.where('user.role = :role', { role: targetRole });
+    queryBuilder.where('user.meRole = :role', { role: targetRole });
 
-    const [users, total] = await queryBuilder
+    const [list, total] = await queryBuilder
+      .select([
+        'user.meIdx',
+        'user.meEmail',
+        'user.meNickname',
+        'user.meIsActive',
+        'user.meRole',
+        'user.createdAt',
+        'user.updatedAt',
+      ])
       .orderBy('user.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
 
+    const lastPage = Math.ceil(total / limit);
+
+    const formattedList = list.map((user) => ({
+      ...user,
+      createdAt: this.formatToKoreanTime(user.createdAt),
+      updatedAt: this.formatToKoreanTime(user.updatedAt),
+    }));
+
     return {
-      users,
-      total,
-      page,
-      limit,
+      page: {
+        total,
+        perPage: limit,
+        currentPage: page,
+        lastPage,
+      },
+      list: formattedList,
     };
   }
 
-  async getUser(id: number): Promise<User> {
+  async getUser(id: number): Promise<any> {
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { meIdx: id },
       relations: ['xrpHolding'],
     });
 
@@ -84,15 +126,24 @@ export class AdminService {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
-    return user;
+    return {
+      ...user,
+      createdAt: this.formatToKoreanTime(user.createdAt),
+      updatedAt: this.formatToKoreanTime(user.updatedAt),
+    };
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { email, password, nickname, role = UserRole.USER } = createUserDto;
+    const {
+      meEmail,
+      mePassword,
+      meNickname,
+      meRole = UserRole.USER,
+    } = createUserDto;
 
     // 이메일 중복 체크
     const existingUser = await this.userRepository.findOne({
-      where: { email },
+      where: { meEmail },
     });
 
     if (existingUser) {
@@ -100,14 +151,14 @@ export class AdminService {
     }
 
     // 비밀번호 해시화
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(mePassword, 12);
 
     // 사용자 생성
     const user = this.userRepository.create({
-      email,
-      password: hashedPassword,
-      nickname,
-      role,
+      meEmail,
+      mePassword: hashedPassword,
+      meNickname,
+      meRole,
     });
 
     return this.userRepository.save(user);
@@ -115,7 +166,7 @@ export class AdminService {
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { meIdx: id },
     });
 
     if (!user) {
@@ -132,33 +183,33 @@ export class AdminService {
     }
 
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { meIdx: id },
     });
 
     if (!user) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
-    user.role = role as UserRole;
+    user.meRole = role as UserRole;
     return this.userRepository.save(user);
   }
 
   async updateUserStatus(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { meIdx: id },
     });
 
     if (!user) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
-    user.isActive = !user.isActive;
+    user.meIsActive = !user.meIsActive;
     return this.userRepository.save(user);
   }
 
   async deleteUser(id: number): Promise<void> {
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { meIdx: id },
     });
 
     if (!user) {

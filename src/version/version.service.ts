@@ -23,55 +23,61 @@ export class VersionService {
     const { currentVersion, platform } = checkVersionDto;
 
     const latestVersion = await this.versionRepository.findOne({
-      where: { platform, isActive: true },
+      where: { vePlatform: platform, veIsActive: true },
       order: { createdAt: 'DESC' },
     });
 
     if (!latestVersion) {
       // 등록된 버전 정보가 없는 경우 업데이트 불필요로 처리
       return {
-        latestVersion: currentVersion,
-        minimumVersion: currentVersion,
-        needsUpdate: false,
-        appStatus: 1,
-        downloadUrl: null,
-        apiDomain: null,
-        releaseNotes: null,
+        veLatestVersion: currentVersion,
+        veMinimumVersion: currentVersion,
+        veNeedsUpdate: false,
+        veAppStatus: 1,
+        veDownloadUrl: null,
+        veApiDomain: null,
+        veReleaseNotes: null,
+        veReviewVersion: null,
+        veShorebirdVersion: null,
+        veDeploymentStatus: null,
       };
     }
 
-    const needsUpdate = semver.gt(latestVersion.version, currentVersion);
+    const needsUpdate = semver.gt(latestVersion.veVersion, currentVersion);
 
     // 앱 상태 결정 로직
-    let appStatus = latestVersion.appStatus;
+    let appStatus = latestVersion.veAppStatus;
     if (
       appStatus === 1 &&
       needsUpdate &&
-      semver.lt(currentVersion, latestVersion.minimumVersion)
+      semver.lt(currentVersion, latestVersion.veMinimumVersion)
     ) {
       // 최소 버전 미만인 경우 강제 업데이트
       appStatus = 2;
     }
 
     let releaseNotes: string[] | null = null;
-    if (latestVersion.releaseNotes) {
+    if (latestVersion.veReleaseNotes) {
       try {
-        releaseNotes = latestVersion.releaseNotes
+        releaseNotes = latestVersion.veReleaseNotes
           .split('\n')
           .filter((note) => note.trim());
       } catch {
-        releaseNotes = [latestVersion.releaseNotes];
+        releaseNotes = [latestVersion.veReleaseNotes];
       }
     }
 
     return {
-      latestVersion: latestVersion.version,
-      minimumVersion: latestVersion.minimumVersion,
-      needsUpdate,
-      appStatus,
-      downloadUrl: latestVersion.downloadUrl,
-      apiDomain: latestVersion.apiDomain,
-      releaseNotes,
+      veLatestVersion: latestVersion.veVersion,
+      veMinimumVersion: latestVersion.veMinimumVersion,
+      veNeedsUpdate: needsUpdate,
+      veAppStatus: appStatus,
+      veDownloadUrl: latestVersion.veDownloadUrl,
+      veApiDomain: latestVersion.veApiDomain,
+      veReleaseNotes: releaseNotes,
+      veReviewVersion: latestVersion.veReviewVersion,
+      veShorebirdVersion: latestVersion.veShorebirdVersion,
+      veDeploymentStatus: latestVersion.veDeploymentStatus,
     };
   }
 
@@ -81,7 +87,7 @@ export class VersionService {
   }
 
   async getVersions(platform?: string): Promise<AppVersion[]> {
-    const where = platform ? { platform } : {};
+    const where = platform ? { vePlatform: platform } : {};
     return this.versionRepository.find({
       where,
       order: { createdAt: 'DESC' },
@@ -93,7 +99,7 @@ export class VersionService {
     updateData: Partial<CreateVersionDto>,
   ): Promise<AppVersion> {
     await this.versionRepository.update(id, updateData);
-    return this.versionRepository.findOne({ where: { id } });
+    return this.versionRepository.findOne({ where: { veIdx: id } });
   }
 
   async deleteVersion(id: number): Promise<void> {
@@ -101,9 +107,11 @@ export class VersionService {
   }
 
   async toggleVersionStatus(id: number): Promise<AppVersion> {
-    const version = await this.versionRepository.findOne({ where: { id } });
+    const version = await this.versionRepository.findOne({
+      where: { veIdx: id },
+    });
     if (version) {
-      version.isActive = !version.isActive;
+      version.veIsActive = !version.veIsActive;
       return this.versionRepository.save(version);
     }
     throw new Error('Version not found');

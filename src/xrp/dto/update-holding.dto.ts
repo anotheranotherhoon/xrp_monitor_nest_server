@@ -10,7 +10,7 @@ export class UpdateHoldingDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
-  quantity?: number;
+  hoQuantity?: number;
 
   @ApiProperty({
     example: 680.75,
@@ -20,14 +20,14 @@ export class UpdateHoldingDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
-  averagePrice?: number;
+  hoAveragePrice?: number;
 
   @ApiProperty({
     example: '추가 매수 후 평단가 조정',
-    description: '메모',
+    description: '멤모',
     required: false,
   })
   @IsOptional()
   @IsString()
-  memo?: string;
+  hoMemo?: string;
 }
