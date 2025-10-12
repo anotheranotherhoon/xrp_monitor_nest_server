@@ -16,30 +16,31 @@ export enum UserRole {
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  meIdx: number;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({ unique: true, name: 'email' })
+  meEmail: string;
 
-  @Column()
-  password: string;
+  @Column({ name: 'password' })
+  mePassword: string;
 
-  @Column({ nullable: true })
-  nickname: string;
+  @Column({ nullable: true, name: 'nickname' })
+  meNickname: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({ default: true, name: 'isActive' })
+  meIsActive: boolean;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.USER,
+    name: 'role',
   })
-  role: UserRole;
+  meRole: UserRole;
 
-  @Column({ nullable: true })
-  refreshToken: string;
+  @Column({ nullable: true, name: 'refreshToken' })
+  meRefreshToken: string;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -23,21 +23,45 @@ export class KeywordService {
 
   async getAllKeywords(): Promise<KeywordsResponseDto> {
     const keywords = await this.keywordRepository.find({
-      where: { isActive: true },
-      order: { weight: 'DESC' },
+      where: { keIsActive: true },
+      order: { keWeight: 'DESC' },
     });
 
     const positiveKeywords = keywords
-      .filter((k) => k.type === KeywordType.POSITIVE)
-      .map((k) => ({ keyword: k.keyword, weight: k.weight }));
+      .filter((k) => k.keType === KeywordType.POSITIVE)
+      .map((k) => ({
+        keIdx: k.keIdx,
+        keKeyword: k.keKeyword,
+        keWeight: k.keWeight,
+        keType: k.keType,
+        keIsActive: k.keIsActive,
+        createdAt: '',
+        updatedAt: '',
+      }));
 
     const negativeKeywords = keywords
-      .filter((k) => k.type === KeywordType.NEGATIVE)
-      .map((k) => ({ keyword: k.keyword, weight: k.weight }));
+      .filter((k) => k.keType === KeywordType.NEGATIVE)
+      .map((k) => ({
+        keIdx: k.keIdx,
+        keKeyword: k.keKeyword,
+        keWeight: k.keWeight,
+        keType: k.keType,
+        keIsActive: k.keIsActive,
+        createdAt: '',
+        updatedAt: '',
+      }));
 
     const importantKeywords = keywords
-      .filter((k) => k.type === KeywordType.IMPORTANT)
-      .map((k) => ({ keyword: k.keyword, weight: k.weight }));
+      .filter((k) => k.keType === KeywordType.IMPORTANT)
+      .map((k) => ({
+        keIdx: k.keIdx,
+        keKeyword: k.keKeyword,
+        keWeight: k.keWeight,
+        keType: k.keType,
+        keIsActive: k.keIsActive,
+        createdAt: '',
+        updatedAt: '',
+      }));
 
     return {
       positiveKeywords,
@@ -48,11 +72,19 @@ export class KeywordService {
 
   async getKeywordsByType(type: KeywordType): Promise<KeywordDto[]> {
     const keywords = await this.keywordRepository.find({
-      where: { type, isActive: true },
-      order: { weight: 'DESC' },
+      where: { keType: type, keIsActive: true },
+      order: { keWeight: 'DESC' },
     });
 
-    return keywords.map((k) => ({ keyword: k.keyword, weight: k.weight }));
+    return keywords.map((k) => ({
+      keIdx: k.keIdx,
+      keKeyword: k.keKeyword,
+      keWeight: k.keWeight,
+      keType: k.keType,
+      keIsActive: k.keIsActive,
+      createdAt: '',
+      updatedAt: '',
+    }));
   }
 
   async getKeywordsForAdmin(): Promise<{
@@ -61,17 +93,17 @@ export class KeywordService {
     importantKeywords: Keyword[];
   }> {
     const keywords = await this.keywordRepository.find({
-      order: { type: 'ASC', weight: 'DESC' },
+      order: { keType: 'ASC', keWeight: 'DESC' },
     });
 
     const positiveKeywords = keywords.filter(
-      (k) => k.type === KeywordType.POSITIVE,
+      (k) => k.keType === KeywordType.POSITIVE,
     );
     const negativeKeywords = keywords.filter(
-      (k) => k.type === KeywordType.NEGATIVE,
+      (k) => k.keType === KeywordType.NEGATIVE,
     );
     const importantKeywords = keywords.filter(
-      (k) => k.type === KeywordType.IMPORTANT,
+      (k) => k.keType === KeywordType.IMPORTANT,
     );
 
     return {
@@ -83,7 +115,7 @@ export class KeywordService {
 
   async getKeywordsDetailForAdmin(): Promise<Keyword[]> {
     return this.keywordRepository.find({
-      order: { type: 'ASC', weight: 'DESC' },
+      order: { keType: 'ASC', keWeight: 'DESC' },
     });
   }
 
@@ -91,8 +123,8 @@ export class KeywordService {
     // 중복 키워드 체크
     const existingKeyword = await this.keywordRepository.findOne({
       where: {
-        keyword: createKeywordDto.keyword,
-        type: createKeywordDto.type,
+        keKeyword: createKeywordDto.keKeyword,
+        keType: createKeywordDto.keType,
       },
     });
 
@@ -109,7 +141,7 @@ export class KeywordService {
     updateKeywordDto: UpdateKeywordDto,
   ): Promise<Keyword> {
     const keyword = await this.keywordRepository.findOne({
-      where: { id },
+      where: { keIdx: id },
     });
 
     if (!keyword) {
@@ -117,15 +149,15 @@ export class KeywordService {
     }
 
     // 키워드와 타입이 변경되는 경우 중복 체크
-    if (updateKeywordDto.keyword && updateKeywordDto.type) {
+    if (updateKeywordDto.keKeyword && updateKeywordDto.keType) {
       const existingKeyword = await this.keywordRepository.findOne({
         where: {
-          keyword: updateKeywordDto.keyword,
-          type: updateKeywordDto.type,
+          keKeyword: updateKeywordDto.keKeyword,
+          keType: updateKeywordDto.keType,
         },
       });
 
-      if (existingKeyword && existingKeyword.id !== id) {
+      if (existingKeyword && existingKeyword.keIdx !== id) {
         throw new BadRequestException('이미 존재하는 키워드입니다.');
       }
     }
@@ -136,7 +168,7 @@ export class KeywordService {
 
   async deleteKeyword(id: number): Promise<void> {
     const keyword = await this.keywordRepository.findOne({
-      where: { id },
+      where: { keIdx: id },
     });
 
     if (!keyword) {
@@ -148,14 +180,14 @@ export class KeywordService {
 
   async toggleKeywordStatus(id: number): Promise<Keyword> {
     const keyword = await this.keywordRepository.findOne({
-      where: { id },
+      where: { keIdx: id },
     });
 
     if (!keyword) {
       throw new NotFoundException('키워드를 찾을 수 없습니다.');
     }
 
-    keyword.isActive = !keyword.isActive;
+    keyword.keIsActive = !keyword.keIsActive;
     return this.keywordRepository.save(keyword);
   }
 
@@ -172,24 +204,27 @@ export class KeywordService {
     // 새로운 키워드들 생성
     for (const keywordData of keywordsData.positiveKeywords) {
       const keyword = this.keywordRepository.create({
-        ...keywordData,
-        type: KeywordType.POSITIVE,
+        keKeyword: keywordData.keKeyword,
+        keWeight: keywordData.keWeight,
+        keType: KeywordType.POSITIVE,
       });
       keywords.push(keyword);
     }
 
     for (const keywordData of keywordsData.negativeKeywords) {
       const keyword = this.keywordRepository.create({
-        ...keywordData,
-        type: KeywordType.NEGATIVE,
+        keKeyword: keywordData.keKeyword,
+        keWeight: keywordData.keWeight,
+        keType: KeywordType.NEGATIVE,
       });
       keywords.push(keyword);
     }
 
     for (const keywordData of keywordsData.importantKeywords) {
       const keyword = this.keywordRepository.create({
-        ...keywordData,
-        type: KeywordType.IMPORTANT,
+        keKeyword: keywordData.keKeyword,
+        keWeight: keywordData.keWeight,
+        keType: KeywordType.IMPORTANT,
       });
       keywords.push(keyword);
     }

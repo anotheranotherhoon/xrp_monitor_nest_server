@@ -14,23 +14,24 @@ export enum KeywordType {
 
 @Entity('keywords')
 export class Keyword {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  keIdx: number;
 
-  @Column()
-  keyword: string;
+  @Column({ name: 'keyword' })
+  keKeyword: string;
 
-  @Column('decimal', { precision: 3, scale: 1 })
-  weight: number;
+  @Column({ name: 'weight', type: 'decimal', precision: 3, scale: 1 })
+  keWeight: number;
 
   @Column({
+    name: 'type',
     type: 'enum',
     enum: KeywordType,
   })
-  type: KeywordType;
+  keType: KeywordType;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({ name: 'isActive', default: true })
+  keIsActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -22,40 +22,40 @@ export class XrpService {
     user: User,
     createHoldingDto: CreateHoldingDto,
   ): Promise<XrpHoldingDto> {
-    const { quantity, averagePrice, memo } = createHoldingDto;
+    const { hoQuantity, hoAveragePrice, hoMemo } = createHoldingDto;
 
-    const totalInvested = quantity * averagePrice;
+    const totalInvested = hoQuantity * hoAveragePrice;
 
     // 기존 보유정보가 있는지 확인
     let holding = await this.holdingRepository.findOne({
-      where: { user: { id: user.id } },
+      where: { user: { meIdx: user.meIdx } },
     });
 
     if (holding) {
       // 기존 보유정보 업데이트
-      holding.quantity = quantity;
-      holding.averagePrice = averagePrice;
-      holding.totalInvested = totalInvested;
-      holding.memo = memo;
+      holding.hoQuantity = hoQuantity;
+      holding.hoAveragePrice = hoAveragePrice;
+      holding.hoTotalInvested = totalInvested;
+      holding.hoMemo = hoMemo;
     } else {
       // 새 보유정보 생성
       holding = this.holdingRepository.create({
         user,
-        quantity,
-        averagePrice,
-        totalInvested,
-        memo,
+        hoQuantity,
+        hoAveragePrice,
+        hoTotalInvested: totalInvested,
+        hoMemo,
       });
     }
 
     const savedHolding = await this.holdingRepository.save(holding);
 
     return {
-      id: savedHolding.id,
-      quantity: savedHolding.quantity.toString(),
-      averagePrice: savedHolding.averagePrice.toString(),
-      totalInvested: savedHolding.totalInvested.toString(),
-      memo: savedHolding.memo,
+      hoIdx: savedHolding.hoIdx,
+      hoQuantity: savedHolding.hoQuantity.toString(),
+      hoAveragePrice: savedHolding.hoAveragePrice.toString(),
+      hoTotalInvested: savedHolding.hoTotalInvested.toString(),
+      hoMemo: savedHolding.hoMemo,
       createdAt: savedHolding.createdAt.toISOString(),
       updatedAt: savedHolding.updatedAt.toISOString(),
     };
@@ -63,7 +63,7 @@ export class XrpService {
 
   async getUserHolding(userId: number): Promise<XrpHoldingDto | null> {
     const holding = await this.holdingRepository.findOne({
-      where: { user: { id: userId } },
+      where: { user: { meIdx: userId } },
     });
 
     if (!holding) {
@@ -71,11 +71,11 @@ export class XrpService {
     }
 
     return {
-      id: holding.id,
-      quantity: holding.quantity.toString(),
-      averagePrice: holding.averagePrice.toString(),
-      totalInvested: holding.totalInvested.toString(),
-      memo: holding.memo,
+      hoIdx: holding.hoIdx,
+      hoQuantity: holding.hoQuantity.toString(),
+      hoAveragePrice: holding.hoAveragePrice.toString(),
+      hoTotalInvested: holding.hoTotalInvested.toString(),
+      hoMemo: holding.hoMemo,
       createdAt: holding.createdAt.toISOString(),
       updatedAt: holding.updatedAt.toISOString(),
     };
@@ -86,7 +86,7 @@ export class XrpService {
     updateHoldingDto: UpdateHoldingDto,
   ): Promise<XrpHoldingDto> {
     const holding = await this.holdingRepository.findOne({
-      where: { user: { id: userId } },
+      where: { user: { meIdx: userId } },
     });
 
     if (!holding) {
@@ -94,27 +94,27 @@ export class XrpService {
     }
 
     // 업데이트할 필드들 적용
-    if (updateHoldingDto.quantity !== undefined) {
-      holding.quantity = updateHoldingDto.quantity;
+    if (updateHoldingDto.hoQuantity !== undefined) {
+      holding.hoQuantity = updateHoldingDto.hoQuantity;
     }
-    if (updateHoldingDto.averagePrice !== undefined) {
-      holding.averagePrice = updateHoldingDto.averagePrice;
+    if (updateHoldingDto.hoAveragePrice !== undefined) {
+      holding.hoAveragePrice = updateHoldingDto.hoAveragePrice;
     }
-    if (updateHoldingDto.memo !== undefined) {
-      holding.memo = updateHoldingDto.memo;
+    if (updateHoldingDto.hoMemo !== undefined) {
+      holding.hoMemo = updateHoldingDto.hoMemo;
     }
 
     // 총 투자금액 재계산
-    holding.totalInvested = holding.quantity * holding.averagePrice;
+    holding.hoTotalInvested = holding.hoQuantity * holding.hoAveragePrice;
 
     const savedHolding = await this.holdingRepository.save(holding);
 
     return {
-      id: savedHolding.id,
-      quantity: savedHolding.quantity.toString(),
-      averagePrice: savedHolding.averagePrice.toString(),
-      totalInvested: savedHolding.totalInvested.toString(),
-      memo: savedHolding.memo,
+      hoIdx: savedHolding.hoIdx,
+      hoQuantity: savedHolding.hoQuantity.toString(),
+      hoAveragePrice: savedHolding.hoAveragePrice.toString(),
+      hoTotalInvested: savedHolding.hoTotalInvested.toString(),
+      hoMemo: savedHolding.hoMemo,
       createdAt: savedHolding.createdAt.toISOString(),
       updatedAt: savedHolding.updatedAt.toISOString(),
     };
@@ -122,7 +122,7 @@ export class XrpService {
 
   async deleteUserHolding(userId: number): Promise<void> {
     const holding = await this.holdingRepository.findOne({
-      where: { user: { id: userId } },
+      where: { user: { meIdx: userId } },
     });
 
     if (!holding) {
@@ -137,7 +137,7 @@ export class XrpService {
     currentXrpPrice?: number,
   ): Promise<XrpHoldingSummaryDto> {
     const holding = await this.holdingRepository.findOne({
-      where: { user: { id: userId } },
+      where: { user: { meIdx: userId } },
     });
 
     if (!holding) {
@@ -156,15 +156,15 @@ export class XrpService {
     let profitLossRate: number | null = null;
 
     if (currentXrpPrice) {
-      const currentValue = holding.quantity * currentXrpPrice;
-      totalProfitLoss = currentValue - holding.totalInvested;
-      profitLossRate = (totalProfitLoss / holding.totalInvested) * 100;
+      const currentValue = holding.hoQuantity * currentXrpPrice;
+      totalProfitLoss = currentValue - holding.hoTotalInvested;
+      profitLossRate = (totalProfitLoss / holding.hoTotalInvested) * 100;
     }
 
     return {
-      totalQuantity: holding.quantity,
-      overallAveragePrice: holding.averagePrice,
-      totalInvested: holding.totalInvested,
+      totalQuantity: holding.hoQuantity,
+      overallAveragePrice: holding.hoAveragePrice,
+      totalInvested: holding.hoTotalInvested,
       holdingsCount: 1,
       currentPrice: currentXrpPrice || null,
       totalProfitLoss,

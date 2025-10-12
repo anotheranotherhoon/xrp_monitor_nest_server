@@ -39,9 +39,8 @@ export class KeywordController {
     description: '키워드 목록 조회 성공',
     type: KeywordsResponseDto,
   })
-  async getAllKeywords(): Promise<{ data: KeywordsResponseDto }> {
-    const data = await this.keywordService.getAllKeywords();
-    return { data };
+  async getAllKeywords(): Promise<KeywordsResponseDto> {
+    return this.keywordService.getAllKeywords();
   }
 
   @Public()
@@ -60,9 +59,8 @@ export class KeywordController {
   })
   async getKeywordsByType(
     @Param('type') type: KeywordType,
-  ): Promise<{ data: KeywordDto[] }> {
-    const data = await this.keywordService.getKeywordsByType(type);
-    return { data };
+  ): Promise<KeywordDto[]> {
+    return this.keywordService.getKeywordsByType(type);
   }
 
   @Get('admin/all')
@@ -75,35 +73,27 @@ export class KeywordController {
     schema: {
       type: 'object',
       properties: {
-        data: {
-          type: 'object',
-          properties: {
-            positiveKeywords: {
-              type: 'array',
-              items: { $ref: '#/components/schemas/Keyword' },
-            },
-            negativeKeywords: {
-              type: 'array',
-              items: { $ref: '#/components/schemas/Keyword' },
-            },
-            importantKeywords: {
-              type: 'array',
-              items: { $ref: '#/components/schemas/Keyword' },
-            },
-          },
+        positiveKeywords: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Keyword' },
+        },
+        negativeKeywords: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Keyword' },
+        },
+        importantKeywords: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Keyword' },
         },
       },
     },
   })
   async getKeywordsForAdmin(): Promise<{
-    data: {
-      positiveKeywords: Keyword[];
-      negativeKeywords: Keyword[];
-      importantKeywords: Keyword[];
-    };
+    positiveKeywords: Keyword[];
+    negativeKeywords: Keyword[];
+    importantKeywords: Keyword[];
   }> {
-    const data = await this.keywordService.getKeywordsForAdmin();
-    return { data };
+    return this.keywordService.getKeywordsForAdmin();
   }
 
   @Get('admin/detail')

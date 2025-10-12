@@ -39,17 +39,69 @@ export class XrpController {
   @ApiResponse({
     status: 201,
     description: 'XRP 보유 정보 생성/수정 성공',
-    type: XrpHoldingDto,
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        code: { type: 'number', example: 201 },
+        message: {
+          type: 'string',
+          example: '요청이 성공적으로 처리되었습니다.',
+        },
+        result: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                hoIdx: {
+                  type: 'number',
+                  example: 1,
+                  description: '보유 정보 고유 식별자',
+                },
+                hoQuantity: {
+                  type: 'string',
+                  example: '1000.12345600',
+                  description: 'XRP 보유 수량',
+                },
+                hoAveragePrice: {
+                  type: 'string',
+                  example: '650.50',
+                  description: 'XRP 평균 매수가 (원)',
+                },
+                hoTotalInvested: {
+                  type: 'string',
+                  example: '650623.45',
+                  description: '총 투자 금액 (원)',
+                },
+                hoMemo: {
+                  type: 'string',
+                  example: '첫 번째 XRP 매수',
+                  description: '메모',
+                  nullable: true,
+                },
+                createdAt: {
+                  type: 'string',
+                  example: '2024-01-01T00:00:00.000Z',
+                  description: '생성일',
+                },
+                updatedAt: {
+                  type: 'string',
+                  example: '2024-01-01T00:00:00.000Z',
+                  description: '수정일',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
   async createOrUpdateHolding(
     @User() user: UserEntity,
     @Body() createHoldingDto: CreateHoldingDto,
-  ): Promise<{ data: XrpHoldingDto }> {
-    const holding = await this.xrpService.createOrUpdateHolding(
-      user,
-      createHoldingDto,
-    );
-    return { data: holding };
+  ): Promise<XrpHoldingDto> {
+    return await this.xrpService.createOrUpdateHolding(user, createHoldingDto);
   }
 
   @Get('holding')
@@ -57,14 +109,85 @@ export class XrpController {
   @ApiResponse({
     status: 200,
     description: 'XRP 보유 정보 조회 성공',
-    type: XrpHoldingDto,
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        code: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: '요청이 성공적으로 처리되었습니다.',
+        },
+        result: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                hoIdx: {
+                  type: 'number',
+                  example: 1,
+                  description: '보유 정보 고유 식별자',
+                },
+                hoQuantity: {
+                  type: 'string',
+                  example: '1000.12345600',
+                  description: 'XRP 보유 수량',
+                },
+                hoAveragePrice: {
+                  type: 'string',
+                  example: '650.50',
+                  description: 'XRP 평균 매수가 (원)',
+                },
+                hoTotalInvested: {
+                  type: 'string',
+                  example: '650623.45',
+                  description: '총 투자 금액 (원)',
+                },
+                hoMemo: {
+                  type: 'string',
+                  example: '첫 번째 XRP 매수',
+                  description: '메모',
+                  nullable: true,
+                },
+                createdAt: {
+                  type: 'string',
+                  example: '2024-01-01T00:00:00.000Z',
+                  description: '생성일',
+                },
+                updatedAt: {
+                  type: 'string',
+                  example: '2024-01-01T00:00:00.000Z',
+                  description: '수정일',
+                },
+              },
+              nullable: true,
+            },
+          },
+        },
+      },
+    },
   })
-  @ApiResponse({ status: 404, description: '보유 정보가 없음' })
+  @ApiResponse({
+    status: 404,
+    description: '보유 정보가 없음',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: false },
+        code: { type: 'number', example: 404 },
+        message: { type: 'string', example: '보유 정보를 찾을 수 없습니다.' },
+        result: {
+          type: 'object',
+          properties: { data: { type: 'null', example: null } },
+        },
+      },
+    },
+  })
   async getUserHolding(
     @User() user: UserEntity,
-  ): Promise<{ data: XrpHoldingDto | null }> {
-    const holding = await this.xrpService.getUserHolding(user.id);
-    return { data: holding };
+  ): Promise<XrpHoldingDto | null> {
+    return await this.xrpService.getUserHolding(user.meIdx);
   }
 
   @Get('holding/summary')
@@ -78,14 +201,72 @@ export class XrpController {
   @ApiResponse({
     status: 200,
     description: 'XRP 보유 요약 정보 조회 성공',
-    type: XrpHoldingSummaryDto,
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        code: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: '요청이 성공적으로 처리되었습니다.',
+        },
+        result: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                totalQuantity: {
+                  type: 'number',
+                  example: 5000.123456,
+                  description: '총 XRP 보유 수량',
+                },
+                overallAveragePrice: {
+                  type: 'number',
+                  example: 670.25,
+                  description: '전체 평균 매수가 (원)',
+                },
+                totalInvested: {
+                  type: 'number',
+                  example: 3351234.56,
+                  description: '총 투자 금액 (원)',
+                },
+                holdingsCount: {
+                  type: 'number',
+                  example: 3,
+                  description: '보유 정보 개수',
+                },
+                currentPrice: {
+                  type: 'number',
+                  example: 680.5,
+                  description: '현재 XRP 가격 (원)',
+                  nullable: true,
+                },
+                totalProfitLoss: {
+                  type: 'number',
+                  example: 51250.89,
+                  description: '총 평가 손익 (원)',
+                  nullable: true,
+                },
+                profitLossRate: {
+                  type: 'number',
+                  example: 1.53,
+                  description: '수익률 (%)',
+                  nullable: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
   async getHoldingSummary(
     @User() user: UserEntity,
     @Query('currentPrice') currentPrice?: number,
   ): Promise<XrpHoldingSummaryDto> {
     return this.xrpService.getHoldingSummary(
-      user.id,
+      user.meIdx,
       currentPrice ? +currentPrice : undefined,
     );
   }
@@ -95,14 +276,81 @@ export class XrpController {
   @ApiResponse({
     status: 200,
     description: 'XRP 보유 정보 수정 성공',
-    type: XrpHoldingDto,
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        code: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: '요청이 성공적으로 처리되었습니다.',
+        },
+        result: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                hoIdx: {
+                  type: 'number',
+                  example: 1,
+                  description: '보유 정보 고유 식별자',
+                },
+                hoQuantity: {
+                  type: 'string',
+                  example: '1500.65432100',
+                  description: 'XRP 보유 수량',
+                },
+                hoAveragePrice: {
+                  type: 'string',
+                  example: '680.75',
+                  description: 'XRP 평균 매수가 (원)',
+                },
+                hoTotalInvested: {
+                  type: 'string',
+                  example: '1021163.23',
+                  description: '총 투자 금액 (원)',
+                },
+                hoMemo: {
+                  type: 'string',
+                  example: '추가 매수 후 평단가 조정',
+                  description: '메모',
+                  nullable: true,
+                },
+                createdAt: {
+                  type: 'string',
+                  example: '2024-01-01T00:00:00.000Z',
+                  description: '생성일',
+                },
+                updatedAt: {
+                  type: 'string',
+                  example: '2024-01-01T12:00:00.000Z',
+                  description: '수정일',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
-  @ApiResponse({ status: 404, description: '보유 정보를 찾을 수 없음' })
+  @ApiResponse({
+    status: 404,
+    description: '보유 정보를 찾을 수 없음',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: false },
+        code: { type: 'number', example: 404 },
+        message: { type: 'string', example: '보유 정보를 찾을 수 없습니다.' },
+      },
+    },
+  })
   async updateUserHolding(
     @User() user: UserEntity,
     @Body() updateHoldingDto: UpdateHoldingDto,
   ): Promise<XrpHoldingDto> {
-    return this.xrpService.updateUserHolding(user.id, updateHoldingDto);
+    return this.xrpService.updateUserHolding(user.meIdx, updateHoldingDto);
   }
 
   @Delete('holding')
@@ -110,12 +358,28 @@ export class XrpController {
   @ApiResponse({
     status: 200,
     description: 'XRP 보유 정보 삭제 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        code: { type: 'number', example: 200 },
+        message: { type: 'string', example: 'XRP 보유 정보가 삭제되었습니다.' },
+      },
+    },
   })
-  @ApiResponse({ status: 404, description: '보유 정보를 찾을 수 없음' })
-  async deleteUserHolding(
-    @User() user: UserEntity,
-  ): Promise<{ message: string }> {
-    await this.xrpService.deleteUserHolding(user.id);
-    return { message: 'XRP 보유 정보가 삭제되었습니다.' };
+  @ApiResponse({
+    status: 404,
+    description: '보유 정보를 찾을 수 없음',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: false },
+        code: { type: 'number', example: 404 },
+        message: { type: 'string', example: '보유 정보를 찾을 수 없습니다.' },
+      },
+    },
+  })
+  async deleteUserHolding(@User() user: UserEntity): Promise<void> {
+    await this.xrpService.deleteUserHolding(user.meIdx);
   }
 }

@@ -11,20 +11,20 @@ import { User } from './user.entity';
 
 @Entity('xrp_holdings')
 export class XrpHolding {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  hoIdx: number;
 
-  @Column('decimal', { precision: 20, scale: 8 })
-  quantity: number;
+  @Column('decimal', { precision: 20, scale: 8, name: 'quantity' })
+  hoQuantity: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  averagePrice: number;
+  @Column('decimal', { precision: 10, scale: 2, name: 'averagePrice' })
+  hoAveragePrice: number;
 
-  @Column('decimal', { precision: 20, scale: 2 })
-  totalInvested: number;
+  @Column('decimal', { precision: 20, scale: 2, name: 'totalInvested' })
+  hoTotalInvested: number;
 
-  @Column({ nullable: true })
-  memo: string | null;
+  @Column({ nullable: true, name: 'memo' })
+  hoMemo: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -33,6 +33,6 @@ export class XrpHolding {
   updatedAt: Date;
 
   @OneToOne(() => User, (user) => user.xrpHolding)
-  @JoinColumn()
+  @JoinColumn({ name: 'userId', referencedColumnName: 'meIdx' })
   user: User;
 }

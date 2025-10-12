@@ -33,12 +33,12 @@ async function createSuperAdmin() {
 
     // 기존 슈퍼관리자 확인
     const existingAdmin = await userRepository.findOne({
-      where: { email },
+      where: { meEmail: email },
     });
 
     if (existingAdmin) {
       console.log('슈퍼관리자가 이미 존재합니다. 권한을 업데이트합니다.');
-      existingAdmin.role = UserRole.SUPER_ADMIN;
+      existingAdmin.meRole = UserRole.SUPER_ADMIN;
       await userRepository.save(existingAdmin);
       console.log('슈퍼관리자 권한이 업데이트되었습니다.');
     } else {
@@ -47,11 +47,11 @@ async function createSuperAdmin() {
 
       // 슈퍼관리자 생성
       const superAdmin = userRepository.create({
-        email,
-        password: hashedPassword,
-        nickname,
-        role: UserRole.SUPER_ADMIN,
-        isActive: true,
+        meEmail: email,
+        mePassword: hashedPassword,
+        meNickname: nickname,
+        meRole: UserRole.SUPER_ADMIN,
+        meIsActive: true,
       });
 
       await userRepository.save(superAdmin);
