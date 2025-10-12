@@ -8,7 +8,7 @@ import {
   IsIn,
   IsEnum,
 } from 'class-validator';
-import { DeploymentStatus } from '../../entities/app-version.entity';
+import { DeploymentStatus } from 'src/entities/app-version.entity';
 
 export class VersionCheckResponseDto {
   @ApiProperty({

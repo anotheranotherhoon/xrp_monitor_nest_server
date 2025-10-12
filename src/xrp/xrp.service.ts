@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { XrpHolding } from '../entities/xrp-holding.entity';
-import { User } from '../entities/user.entity';
+import { XrpHolding } from 'src/entities/xrp-holding.entity';
+import { User } from 'src/entities/user.entity';
 import { CreateHoldingDto } from './dto/create-holding.dto';
 import { UpdateHoldingDto } from './dto/update-holding.dto';
 import {

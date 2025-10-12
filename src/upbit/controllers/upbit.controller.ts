@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   UpbitPaginatedResponseDto,
   UpbitPaginatedResultDto,
-} from '../dto/upbit-paginated-response.dto';
+} from 'src/upbit/dto/upbit-paginated-response.dto';
 
 @ApiTags('💹upbit')
 @Controller('upbit')

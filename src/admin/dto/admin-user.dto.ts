@@ -8,7 +8,7 @@ import {
   IsNumber,
   IsBoolean,
 } from 'class-validator';
-import { UserRole } from '../../entities/user.entity';
+import { UserRole } from 'src/entities/user.entity';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'admin@example.com', description: '사용자 이메일' })

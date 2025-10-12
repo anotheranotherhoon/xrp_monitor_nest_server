@@ -17,10 +17,10 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
-import { Admin } from '../auth/decorators/admin.decorator';
-import { AdminService } from './admin.service';
-import { User } from '../entities/user.entity';
-import { CreateUserDto, UpdateUserDto } from './dto/admin-user.dto';
+import { Admin } from 'src/auth/decorators/admin.decorator';
+import { AdminService } from 'src/admin/admin.service';
+import { User } from 'src/entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from 'src/admin/dto/admin-user.dto';
 
 @ApiTags('🔧 관리자 페이지')
 @Controller('admin')

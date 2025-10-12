@@ -15,16 +15,16 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 
-import { KeywordService } from './keyword.service';
-import { Admin } from '../auth/decorators/admin.decorator';
-import { Public } from '../auth/decorators/public.decorator';
-import { Keyword, KeywordType } from '../entities/keyword.entity';
+import { KeywordService } from 'src/keyword/keyword.service';
+import { Admin } from 'src/auth/decorators/admin.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { Keyword, KeywordType } from 'src/entities/keyword.entity';
 import {
   CreateKeywordDto,
   UpdateKeywordDto,
   KeywordsResponseDto,
   KeywordDto,
-} from './dto/keyword.dto';
+} from 'src/keyword/dto/keyword.dto';
 
 @ApiTags('🔑 키워드 관리')
 @Controller('keyword')
@@ -39,7 +39,28 @@ export class KeywordController {
     description: '키워드 목록 조회 성공',
     type: KeywordsResponseDto,
   })
-  async getAllKeywords(): Promise<{ data: KeywordsResponseDto }> {
+  async getAllKeywords(): Promise<{
+    data: {
+      positiveKeywords: Array<{
+        keIdx: number;
+        keKeyword: string;
+        keWeight: number;
+        keType: KeywordType;
+      }>;
+      negativeKeywords: Array<{
+        keIdx: number;
+        keKeyword: string;
+        keWeight: number;
+        keType: KeywordType;
+      }>;
+      importantKeywords: Array<{
+        keIdx: number;
+        keKeyword: string;
+        keWeight: number;
+        keType: KeywordType;
+      }>;
+    };
+  }> {
     const keywords = await this.keywordService.getAllKeywords();
     return { data: keywords };
   }

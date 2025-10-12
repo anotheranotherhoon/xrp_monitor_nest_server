@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 
-import { User } from '../entities/user.entity';
+import { User } from 'src/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto, UserDto } from './dto/auth-response.dto';

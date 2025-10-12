@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
-import { Keyword, KeywordType } from '../entities/keyword.entity';
-import { XrpHolding } from '../entities/xrp-holding.entity';
-import { AppVersion } from '../entities/app-version.entity';
-import { User } from '../entities/user.entity';
+import { Keyword, KeywordType } from 'src/entities/keyword.entity';
+import { XrpHolding } from 'src/entities/xrp-holding.entity';
+import { AppVersion } from 'src/entities/app-version.entity';
+import { User } from 'src/entities/user.entity';
 
 /**
  * 초기 키워드 데이터를 생성하는 스크립트

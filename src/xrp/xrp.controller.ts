@@ -23,9 +23,9 @@ import {
   XrpHoldingDto,
   XrpHoldingSummaryDto,
 } from './dto/holding-response.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { User } from '../auth/decorators/user.decorator';
-import { User as UserEntity } from '../entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/auth/decorators/user.decorator';
+import { User as UserEntity } from 'src/entities/user.entity';
 
 @ApiTags('💰 XRP 보유')
 @Controller('xrp')

@@ -26,8 +26,8 @@ import {
   VersionListResponseDto,
   VersionItemDto,
 } from './dto/version-response.dto';
-import { Public } from '../auth/decorators/public.decorator';
-import { Admin } from '../auth/decorators/admin.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { Admin } from 'src/auth/decorators/admin.decorator';
 
 @ApiTags('📱 버전 관리')
 @Controller('version')

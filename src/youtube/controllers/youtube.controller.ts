@@ -6,12 +6,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { YoutubeService } from '../services/youtube.service';
-import { YoutubeSearchItemDto } from '../dto/youtube-search.dto';
+import { YoutubeService } from 'src/youtube/services/youtube.service';
+import { YoutubeSearchItemDto } from 'src/youtube/dto/youtube-search.dto';
 import {
   YoutubePaginatedResponseDto,
   YoutubePaginatedResultDto,
-} from '../dto/youtube-paginated-response.dto';
+} from 'src/youtube/dto/youtube-paginated-response.dto';
 
 @ApiTags('▶️youtube')
 @Controller('youtube')

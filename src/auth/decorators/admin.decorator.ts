@@ -1,8 +1,8 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { RolesGuard } from '../guards/roles.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from './roles.decorator';
-import { UserRole } from '../../entities/user.entity';
+import { UserRole } from 'src/entities/user.entity';
 
 export const Admin = () =>
   applyDecorators(

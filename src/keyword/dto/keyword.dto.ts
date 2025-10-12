@@ -8,7 +8,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { KeywordType } from '../../entities/keyword.entity';
+import { KeywordType } from 'src/entities/keyword.entity';
 
 export class KeywordDto {
   @ApiProperty({

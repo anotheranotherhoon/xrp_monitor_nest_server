@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { VersionController } from './version.controller';
 import { VersionService } from './version.service';
-import { AppVersion } from '../entities/app-version.entity';
+import { AppVersion } from 'src/entities/app-version.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([AppVersion])],

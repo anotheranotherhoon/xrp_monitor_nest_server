@@ -14,7 +14,7 @@ import {
   UpbitService,
   CandleData,
   TickerData,
-} from '../services/upbit.service';
+} from 'src/upbit/services/upbit.service';
 
 interface ClientData {
   subscribedMarkets: Set<string>;

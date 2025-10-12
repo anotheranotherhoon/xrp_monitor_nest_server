@@ -26,7 +26,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from './decorators/public.decorator';
 import { User } from './decorators/user.decorator';
 import { SuperAdmin } from './decorators/admin.decorator';
-import { User as UserEntity } from '../entities/user.entity';
+import { User as UserEntity } from 'src/entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateAdminDto } from './dto/create-admin.dto';
 

@@ -6,13 +6,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Keyword, KeywordType } from '../entities/keyword.entity';
+import { Keyword, KeywordType } from 'src/entities/keyword.entity';
 import {
   CreateKeywordDto,
   UpdateKeywordDto,
-  KeywordsResponseDto,
   KeywordDto,
-} from './dto/keyword.dto';
+} from 'src/keyword/dto/keyword.dto';
 
 @Injectable()
 export class KeywordService {
@@ -21,7 +20,26 @@ export class KeywordService {
     private keywordRepository: Repository<Keyword>,
   ) {}
 
-  async getAllKeywords(): Promise<KeywordsResponseDto> {
+  async getAllKeywords(): Promise<{
+    positiveKeywords: Array<{
+      keIdx: number;
+      keKeyword: string;
+      keWeight: number;
+      keType: KeywordType;
+    }>;
+    negativeKeywords: Array<{
+      keIdx: number;
+      keKeyword: string;
+      keWeight: number;
+      keType: KeywordType;
+    }>;
+    importantKeywords: Array<{
+      keIdx: number;
+      keKeyword: string;
+      keWeight: number;
+      keType: KeywordType;
+    }>;
+  }> {
     const keywords = await this.keywordRepository.find({
       where: { keIsActive: true },
       order: { keWeight: 'DESC' },
@@ -34,9 +52,6 @@ export class KeywordService {
         keKeyword: k.keKeyword,
         keWeight: k.keWeight,
         keType: k.keType,
-        keIsActive: k.keIsActive,
-        createdAt: '',
-        updatedAt: '',
       }));
 
     const negativeKeywords = keywords
@@ -46,9 +61,6 @@ export class KeywordService {
         keKeyword: k.keKeyword,
         keWeight: k.keWeight,
         keType: k.keType,
-        keIsActive: k.keIsActive,
-        createdAt: '',
-        updatedAt: '',
       }));
 
     const importantKeywords = keywords
@@ -58,9 +70,6 @@ export class KeywordService {
         keKeyword: k.keKeyword,
         keWeight: k.keWeight,
         keType: k.keType,
-        keIsActive: k.keIsActive,
-        createdAt: '',
-        updatedAt: '',
       }));
 
     return {

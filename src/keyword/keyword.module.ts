@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { KeywordController } from './keyword.controller';
 import { KeywordService } from './keyword.service';
-import { Keyword } from '../entities/keyword.entity';
+import { Keyword } from 'src/entities/keyword.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Keyword])],
