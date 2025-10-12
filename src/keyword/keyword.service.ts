@@ -192,9 +192,9 @@ export class KeywordService {
   }
 
   async bulkCreateKeywords(keywordsData: {
-    positiveKeywords: KeywordDto[];
-    negativeKeywords: KeywordDto[];
-    importantKeywords: KeywordDto[];
+    positiveKeywords: { keKeyword: string; keWeight: number }[];
+    negativeKeywords: { keKeyword: string; keWeight: number }[];
+    importantKeywords: { keKeyword: string; keWeight: number }[];
   }): Promise<Keyword[]> {
     const keywords: Keyword[] = [];
 
