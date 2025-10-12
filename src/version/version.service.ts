@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as semver from 'semver';
 
-import { AppVersion } from '../entities/app-version.entity';
+import { AppVersion } from 'src/entities/app-version.entity';
 import { CheckVersionDto } from './dto/check-version.dto';
 import {
   VersionCheckResponseDto,

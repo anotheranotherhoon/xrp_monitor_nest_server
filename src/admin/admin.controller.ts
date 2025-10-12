@@ -17,10 +17,10 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
-import { Admin } from '../auth/decorators/admin.decorator';
-import { AdminService } from './admin.service';
-import { User } from '../entities/user.entity';
-import { CreateUserDto, UpdateUserDto } from './dto/admin-user.dto';
+import { Admin } from 'src/auth/decorators/admin.decorator';
+import { AdminService } from 'src/admin/admin.service';
+import { User } from 'src/entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from 'src/admin/dto/admin-user.dto';
 
 @ApiTags('🔧 관리자 페이지')
 @Controller('admin')
@@ -169,11 +169,13 @@ export class AdminController {
     },
   })
   async getUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
     @Query('role') role?: string,
   ) {
-    return await this.adminService.getUsers(page, limit, role);
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return await this.adminService.getUsers(pageNum, limitNum, role);
   }
 
   @Get('users/:id')

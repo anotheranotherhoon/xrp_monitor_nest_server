@@ -5,7 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { CustomErrorResponse } from '../dto/custom-error-response.dto';
+import { CustomErrorResponse } from 'src/common/dto/custom-error-response.dto';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

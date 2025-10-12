@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TweetRepository } from '../repositories/tweet.repository';
+import { TweetRepository } from 'src/tweet/repositories/tweet.repository';
 
 @Injectable()
 export class TweetService {

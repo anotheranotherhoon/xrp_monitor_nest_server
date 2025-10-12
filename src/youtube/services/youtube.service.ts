@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { YoutubeRepository } from '../repositories/youtube.repository';
+import { YoutubeRepository } from 'src/youtube/repositories/youtube.repository';
 
 @Injectable()
 export class YoutubeService {

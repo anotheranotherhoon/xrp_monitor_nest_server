@@ -15,16 +15,16 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 
-import { KeywordService } from './keyword.service';
-import { Admin } from '../auth/decorators/admin.decorator';
-import { Public } from '../auth/decorators/public.decorator';
-import { Keyword, KeywordType } from '../entities/keyword.entity';
+import { KeywordService } from 'src/keyword/keyword.service';
+import { Admin } from 'src/auth/decorators/admin.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { Keyword, KeywordType } from 'src/entities/keyword.entity';
 import {
   CreateKeywordDto,
   UpdateKeywordDto,
   KeywordsResponseDto,
   KeywordDto,
-} from './dto/keyword.dto';
+} from 'src/keyword/dto/keyword.dto';
 
 @ApiTags('🔑 키워드 관리')
 @Controller('keyword')
@@ -39,8 +39,30 @@ export class KeywordController {
     description: '키워드 목록 조회 성공',
     type: KeywordsResponseDto,
   })
-  async getAllKeywords(): Promise<KeywordsResponseDto> {
-    return this.keywordService.getAllKeywords();
+  async getAllKeywords(): Promise<{
+    data: {
+      positiveKeywords: Array<{
+        keIdx: number;
+        keKeyword: string;
+        keWeight: number;
+        keType: KeywordType;
+      }>;
+      negativeKeywords: Array<{
+        keIdx: number;
+        keKeyword: string;
+        keWeight: number;
+        keType: KeywordType;
+      }>;
+      importantKeywords: Array<{
+        keIdx: number;
+        keKeyword: string;
+        keWeight: number;
+        keType: KeywordType;
+      }>;
+    };
+  }> {
+    const keywords = await this.keywordService.getAllKeywords();
+    return { data: keywords };
   }
 
   @Public()
@@ -89,11 +111,14 @@ export class KeywordController {
     },
   })
   async getKeywordsForAdmin(): Promise<{
-    positiveKeywords: Keyword[];
-    negativeKeywords: Keyword[];
-    importantKeywords: Keyword[];
+    data: {
+      positiveKeywords: Keyword[];
+      negativeKeywords: Keyword[];
+      importantKeywords: Keyword[];
+    };
   }> {
-    return this.keywordService.getKeywordsForAdmin();
+    const keywords = await this.keywordService.getKeywordsForAdmin();
+    return { data: keywords };
   }
 
   @Get('admin/detail')
@@ -172,20 +197,90 @@ export class KeywordController {
   @Post('admin/bulk')
   @Admin()
   @ApiBearerAuth()
-  @ApiOperation({ summary: '키워드 일괄 생성 (관리자용)' })
+  @ApiOperation({
+    summary: '키워드 일괄 생성/교체 (관리자용)',
+    description:
+      '기존 키워드를 모두 삭제하고 새로운 키워드 목록으로 일괄 교체합니다. 각 타입별로 키워드 배열을 전송하면, 해당 타입의 기존 키워드는 모두 삭제되고 새로운 키워드로 생성됩니다.',
+  })
   @ApiResponse({
     status: 201,
-    description: '키워드 일괄 생성 성공',
-    type: [Keyword],
+    description: '키워드 일괄 생성/교체 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        code: { type: 'number', example: 201 },
+        message: {
+          type: 'string',
+          example: '요청이 성공적으로 처리되었습니다.',
+        },
+        result: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  keIdx: {
+                    type: 'number',
+                    example: 1,
+                    description: '키워드 고유 식별자',
+                  },
+                  keKeyword: {
+                    type: 'string',
+                    example: '상승',
+                    description: '키워드',
+                  },
+                  keWeight: {
+                    type: 'string',
+                    example: '1.5',
+                    description: '가중치',
+                  },
+                  keType: {
+                    type: 'string',
+                    example: 'POSITIVE',
+                    enum: ['POSITIVE', 'NEGATIVE', 'IMPORTANT'],
+                  },
+                  keIsActive: {
+                    type: 'boolean',
+                    example: true,
+                    description: '활성 상태',
+                  },
+                  createdAt: { type: 'string', example: '2025-10-12 15:30:00' },
+                  updatedAt: { type: 'string', example: '2025-10-12 15:30:00' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청 데이터',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: false },
+        code: { type: 'number', example: 400 },
+        message: {
+          type: 'string',
+          example: 'keKeyword must be a string, keWeight must be a number',
+        },
+      },
+    },
   })
   async bulkCreateKeywords(
     @Body()
     keywordsData: {
-      positiveKeywords: KeywordDto[];
-      negativeKeywords: KeywordDto[];
-      importantKeywords: KeywordDto[];
+      positiveKeywords: { keKeyword: string; keWeight: number }[];
+      negativeKeywords: { keKeyword: string; keWeight: number }[];
+      importantKeywords: { keKeyword: string; keWeight: number }[];
     },
-  ): Promise<Keyword[]> {
-    return this.keywordService.bulkCreateKeywords(keywordsData);
+  ): Promise<{ data: Keyword[] }> {
+    const result = await this.keywordService.bulkCreateKeywords(keywordsData);
+    return { data: result };
   }
 }

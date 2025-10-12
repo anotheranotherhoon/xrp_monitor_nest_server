@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { XrpController } from './xrp.controller';
 import { XrpService } from './xrp.service';
-import { XrpHolding } from '../entities/xrp-holding.entity';
+import { XrpHolding } from 'src/entities/xrp-holding.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([XrpHolding])],

@@ -7,12 +7,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { TweetService } from '../services/tweet.service';
-import { TweetItemDto } from '../dto/tweet.dto';
+import { TweetService } from 'src/tweet/services/tweet.service';
+import { TweetItemDto } from 'src/tweet/dto/tweet.dto';
 import {
   TweetPaginatedResponseDto,
   TweetPaginatedResultDto,
-} from '../dto/tweet-paginated-response.dto';
+} from 'src/tweet/dto/tweet-paginated-response.dto';
 
 @ApiTags('🐦tweet')
 @Controller('tweet')

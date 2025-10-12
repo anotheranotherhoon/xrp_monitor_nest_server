@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { User, UserRole } from '../entities/user.entity';
-import { XrpHolding } from '../entities/xrp-holding.entity';
-import { AppVersion } from '../entities/app-version.entity';
+import { User, UserRole } from 'src/entities/user.entity';
+import { XrpHolding } from 'src/entities/xrp-holding.entity';
+import { AppVersion } from 'src/entities/app-version.entity';
 
 /**
  * 기존 회원들을 모두 USER 타입으로 설정하는 마이그레이션

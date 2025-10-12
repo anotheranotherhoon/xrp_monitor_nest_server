@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -35,6 +36,16 @@ async function bootstrap() {
     credentials: true,
   });
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // DTO에 정의되지 않은 속성 제거
+      forbidNonWhitelisted: true, // DTO에 정의되지 않은 속성이 있으면 에러 발생 (Body에만 적용)
+      transform: true, // 요청 데이터를 DTO 타입으로 자동 변환
+      skipMissingProperties: false, // 필수 속성 누락 시 에러 발생
+      skipNullProperties: false, // null 값 속성도 검증
+      skipUndefinedProperties: false, // undefined 값 속성도 검증
+    }),
+  );
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 

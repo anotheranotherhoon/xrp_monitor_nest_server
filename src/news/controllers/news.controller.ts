@@ -6,12 +6,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { NewsService } from '../services/news.service';
-import { NaverNewsItemDto } from '../dto/naver-news.dto';
+import { NewsService } from 'src/news/services/news.service';
+import { NaverNewsItemDto } from 'src/news/dto/naver-news.dto';
 import {
   NewsPaginatedResponseDto,
   NewsPaginatedResultDto,
-} from '../dto/news-paginated-response.dto';
+} from 'src/news/dto/news-paginated-response.dto';
 
 @ApiTags('📰news')
 @Controller('news')

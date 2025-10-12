@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PageInfoDto } from '../../common/dto/paginated-response.dto';
+import { PageInfoDto } from 'src/common/dto/paginated-response.dto';
 
 export class XrpHoldingDto {
   @ApiProperty({ example: 1, description: '보유 정보 고유 식별자' })

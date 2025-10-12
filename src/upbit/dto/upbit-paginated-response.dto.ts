@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PageInfoDto } from '../../common/dto/paginated-response.dto';
+import { PageInfoDto } from 'src/common/dto/paginated-response.dto';
 import { UpbitSocketDocsDto } from './socket-docs.dto';
 
 export class UpbitPaginatedResultDto {

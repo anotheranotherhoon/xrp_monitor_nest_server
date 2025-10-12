@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { User, UserRole } from '../entities/user.entity';
-import { XrpHolding } from '../entities/xrp-holding.entity';
-import { AppVersion } from '../entities/app-version.entity';
+import { User, UserRole } from 'src/entities/user.entity';
+import { XrpHolding } from 'src/entities/xrp-holding.entity';
+import { AppVersion } from 'src/entities/app-version.entity';
 
 /**
  * 슈퍼관리자 계정을 직접 생성하는 스크립트
