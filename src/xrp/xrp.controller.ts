@@ -19,10 +19,7 @@ import {
 import { XrpService } from './xrp.service';
 import { CreateHoldingDto } from './dto/create-holding.dto';
 import { UpdateHoldingDto } from './dto/update-holding.dto';
-import {
-  XrpHoldingDto,
-  XrpHoldingSummaryDto,
-} from './dto/holding-response.dto';
+import { XrpHoldingSummaryDto } from './dto/holding-response.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/auth/decorators/user.decorator';
 import { User as UserEntity } from 'src/entities/user.entity';
@@ -100,8 +97,12 @@ export class XrpController {
   async createOrUpdateHolding(
     @User() user: UserEntity,
     @Body() createHoldingDto: CreateHoldingDto,
-  ): Promise<XrpHoldingDto> {
-    return await this.xrpService.createOrUpdateHolding(user, createHoldingDto);
+  ) {
+    const holding = await this.xrpService.createOrUpdateHolding(
+      user,
+      createHoldingDto,
+    );
+    return { data: holding };
   }
 
   @Get('holding')
@@ -184,10 +185,9 @@ export class XrpController {
       },
     },
   })
-  async getUserHolding(
-    @User() user: UserEntity,
-  ): Promise<XrpHoldingDto | null> {
-    return await this.xrpService.getUserHolding(user.meIdx);
+  async getUserHolding(@User() user: UserEntity) {
+    const holding = await this.xrpService.getUserHolding(user.meIdx);
+    return { data: holding };
   }
 
   @Get('holding/summary')
@@ -347,8 +347,12 @@ export class XrpController {
   async updateUserHolding(
     @User() user: UserEntity,
     @Body() updateHoldingDto: UpdateHoldingDto,
-  ): Promise<XrpHoldingDto> {
-    return this.xrpService.updateUserHolding(user.meIdx, updateHoldingDto);
+  ) {
+    const holding = await this.xrpService.updateUserHolding(
+      user.meIdx,
+      updateHoldingDto,
+    );
+    return { data: holding };
   }
 
   @Delete('holding')

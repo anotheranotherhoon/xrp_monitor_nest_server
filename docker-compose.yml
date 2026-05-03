@@ -1,0 +1,36 @@
+version: '3'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xrp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  app:
+    build: .
+    container_name: nestjs
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: xrp
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      NODE_ENV: production
+      YOUTUBE_API_KEY: AIzaSyCSTZUuqKrzT7UK5M6EaPtTFhBo3QSYf_4
+      NAVER_CLIENT_ID: F7hqqLA3DynrEhbzts5z
+      NAVER_CLIENT_SECRET_KEY: B5Gqsq8zwm
+      X_BEARER_TOKEN: AAAAAAAAAAAAAAAAAAAAAHYF4AEAAAAAN57xRJ0rx5lTNprFpuqlyu0GM3A%3DoOqRBgMkeUOlvEKsvdnsioflueYQ0hD9tSVzFPWMH7g8ErRfIc%
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  postgres_data:
