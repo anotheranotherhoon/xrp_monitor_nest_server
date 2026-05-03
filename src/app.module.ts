@@ -32,7 +32,7 @@ import { User, XrpHolding, AppVersion, Keyword } from './entities';
       database: process.env.DB_DATABASE || 'xrp',
       entities: [User, XrpHolding, AppVersion, Keyword],
       synchronize: process.env.NODE_ENV !== 'production',
-      ssl: process.env.NODE_ENV === 'production',
+      ssl: false,
     }),
     HttpModule,
     ScheduleModule.forRoot(),

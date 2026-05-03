@@ -22,7 +22,7 @@ import { AdminService } from 'src/admin/admin.service';
 import { User } from 'src/entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from 'src/admin/dto/admin-user.dto';
 
-@ApiTags('🔧 관리자 페이지')
+@ApiTags('관리자 - 사용자')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
