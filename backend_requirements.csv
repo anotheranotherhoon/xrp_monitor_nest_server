@@ -1,0 +1,68 @@
+요구사항ID,요구사항명,하위 요구사항ID,하위 요구사항명,상세 설명
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-01,JWT 기반 회원가입,"이메일, 닉네임, 비밀번호를 통한 계정 생성. 이메일 중복 검증 및 bcrypt 암호화 적용. UserRole.USER로 기본 역할 할당"
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-02,JWT 기반 로그인,"이메일과 비밀번호 검증 후 AccessToken과 RefreshToken 발급. 사용자 정보를 JWT payload에 포함"
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-03,JWT 토큰 갱신,"RefreshToken을 검증하여 새로운 AccessToken과 RefreshToken 발급. 만료된 토큰 자동 정리"
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-04,로그아웃 처리,사용자 RefreshToken을 null로 설정하여 토큰 무효화 처리
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-05,사용자 프로필 조회,"JWT 토큰에서 사용자 정보를 추출하여 프로필 정보 반환. 비밀번호 필드 제외"
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-06,관리자 계정 생성,"SUPER_ADMIN 권한으로만 ADMIN 계정 생성 가능. 별도 CreateAdminDto 사용"
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-07,역할 기반 접근 제어,"USER, ADMIN, SUPER_ADMIN 3단계 권한 시스템. RolesGuard와 @Roles 데코레이터 활용"
+REQ-BE-001,사용자 인증 및 권한 관리,REQ-BE-001-08,글로벌 JWT 가드,"APP_GUARD로 JwtAuthGuard 전역 적용. @Public() 데코레이터로 인증 우회 가능"
+REQ-BE-002,XRP 포트폴리오 관리,REQ-BE-002-01,XRP 보유 정보 생성/수정,"사용자별 XRP 수량(precision 20, scale 8), 평균 매수가(precision 10, scale 2), 총 투자 금액, 메모 저장"
+REQ-BE-002,XRP 포트폴리오 관리,REQ-BE-002-02,XRP 보유 정보 조회,"사용자 고유 XRP 보유 정보 조회. 보유 정보가 없을 경우 404 에러 반환"
+REQ-BE-002,XRP 포트폴리오 관리,REQ-BE-002-03,XRP 보유 요약 정보,"현재 가격 파라미터를 통해 실시간 수익률, 평가 손익 계산. 총 수량, 평균 매수가, 투자 금액 요약"
+REQ-BE-002,XRP 포트폴리오 관리,REQ-BE-002-04,XRP 보유 정보 수정,"기존 보유 정보 업데이트. 수량, 평균가, 메모 수정 가능"
+REQ-BE-002,XRP 포트폴리오 관리,REQ-BE-002-05,XRP 보유 정보 삭제,"사용자 보유 정보 완전 삭제. 복구 불가능한 삭제 처리"
+REQ-BE-003,실시간 업비트 데이터,REQ-BE-003-01,WebSocket 실시간 연결,"Socket.IO 기반 클라이언트 연결 관리. CORS 허용 및 WebSocket transport 전용"
+REQ-BE-003,실시간 업비트 데이터,REQ-BE-003-02,캔들 데이터 구독,"KRW-XRP, KRW-BTC, KRW-ETH 마켓별 캔들 데이터 구독. 최대 200개 캔들 유지"
+REQ-BE-003,실시간 업비트 데이터,REQ-BE-003-03,실시간 티커 데이터,"업비트 WebSocket에서 실시간 가격, 변동률, 거래량 데이터 수신 및 클라이언트 전송"
+REQ-BE-003,실시간 업비트 데이터,REQ-BE-003-04,분봉 캔들 업데이트,Cron 스케줄러로 매분 새로운 캔들 데이터 조회 및 구독 클라이언트에 전송
+REQ-BE-003,실시간 업비트 데이터,REQ-BE-003-05,서버 상태 브로드캐스트,"30초마다 연결된 클라이언트 수, 서버 가동 시간 정보를 모든 클라이언트에 전송"
+REQ-BE-003,실시간 업비트 데이터,REQ-BE-003-06,클라이언트 구독 관리,"클라이언트별 구독 마켓 Set과 캔들 데이터 Map 관리. 연결/해제 시 자동 정리"
+REQ-BE-004,뉴스 데이터 관리,REQ-BE-004-01,네이버 뉴스 API 연동,Naver News API를 통한 XRP 관련 뉴스 검색 및 수집
+REQ-BE-004,뉴스 데이터 관리,REQ-BE-004-02,뉴스 페이징 조회,"cursor 기반 페이징으로 뉴스 목록 조회. page, size 파라미터 지원"
+REQ-BE-004,뉴스 데이터 관리,REQ-BE-004-03,뉴스 데이터 구조화,"제목, 링크, 설명, 발행일, 썸네일 정보를 NaverNewsDto 형태로 구조화"
+REQ-BE-005,트위터 데이터 관리,REQ-BE-005-01,트위터 API 연동,Twitter API v2를 통한 XRP 관련 트윗 검색 및 수집
+REQ-BE-005,트위터 데이터 관리,REQ-BE-005-02,트윗 페이징 조회,"cursor 기반 페이징으로 트윗 목록 조회. 다음/이전 페이지 네비게이션 지원"
+REQ-BE-005,트위터 데이터 관리,REQ-BE-005-03,트윗 데이터 구조화,"트윗 ID, 텍스트, 작성자 정보, 생성일, 공개 지표를 TweetDto 형태로 구조화"
+REQ-BE-006,유튜브 데이터 관리,REQ-BE-006-01,유튜브 API 연동,YouTube Data API v3를 통한 XRP 관련 영상 검색 및 수집
+REQ-BE-006,유튜브 데이터 관리,REQ-BE-006-02,유튜브 영상 페이징 조회,"pageToken 기반 페이징으로 영상 목록 조회. maxResults 파라미터 지원"
+REQ-BE-006,유튜브 데이터 관리,REQ-BE-006-03,유튜브 데이터 구조화,"영상 ID, 제목, 설명, 썸네일, 채널 정보, 발행일을 YoutubeSearchDto 형태로 구조화"
+REQ-BE-007,키워드 감성 분석 시스템,REQ-BE-007-01,키워드 생성 및 관리,"POSITIVE, NEGATIVE, IMPORTANT 타입별 키워드 생성. 가중치(precision 3, scale 1) 설정"
+REQ-BE-007,키워드 감성 분석 시스템,REQ-BE-007-02,키워드 활성화/비활성화,"isActive 플래그를 통한 키워드 활성화 상태 관리. 실시간 감성 분석 반영"
+REQ-BE-007,키워드 감성 분석 시스템,REQ-BE-007-03,타입별 키워드 조회,"POSITIVE, NEGATIVE, IMPORTANT 키워드를 타입별로 그룹핑하여 조회"
+REQ-BE-007,키워드 감성 분석 시스템,REQ-BE-007-04,키워드 시드 데이터,npm run seed-keywords 스크립트를 통한 초기 키워드 데이터 삽입
+REQ-BE-008,앱 버전 관리 시스템,REQ-BE-008-01,플랫폼별 버전 관리,"iOS, Android, Web 플랫폼별 현재 버전, 최소 지원 버전 관리"
+REQ-BE-008,앱 버전 관리 시스템,REQ-BE-008-02,앱 상태 관리,"정상(1), 강제업데이트(2), 점검중(3) 상태 관리. 클라이언트 접근 제어"
+REQ-BE-008,앱 버전 관리 시스템,REQ-BE-008-03,버전 체크 API,클라이언트 버전과 플랫폼 정보로 업데이트 필요 여부 판단
+REQ-BE-008,앱 버전 관리 시스템,REQ-BE-008-04,배포 상태 관리,"DEPLOYING, IN_REVIEW, REVIEW_COMPLETE, DEVELOPMENT 배포 상태 트래킹"
+REQ-BE-008,앱 버전 관리 시스템,REQ-BE-008-05,Shorebird 버전 관리,"Shorebird 코드푸시를 위한 별도 버전 관리. 심사 버전과 구분"
+REQ-BE-009,관리자 시스템,REQ-BE-009-01,관리자 사용자 목록 조회,"페이징 지원하는 전체 사용자 목록 조회. 관리자 권한 필요"
+REQ-BE-009,관리자 시스템,REQ-BE-009-02,사용자 상태 관리,"사용자 활성화/비활성화 상태 변경. isActive 플래그 제어"
+REQ-BE-009,관리자 시스템,REQ-BE-009-03,사용자 역할 변경,"USER, ADMIN 역할 변경. SUPER_ADMIN은 스크립트를 통해서만 생성"
+REQ-BE-010,데이터베이스 및 마이그레이션,REQ-BE-010-01,PostgreSQL 연동,TypeORM을 통한 PostgreSQL 데이터베이스 연결 및 엔티티 매핑
+REQ-BE-010,데이터베이스 및 마이그레이션,REQ-BE-010-02,엔티티 필드 명명 규칙,"모든 ID 필드는 접두사 사용(meIdx, hoIdx, keIdx, veIdx). createdAt, updatedAt 예외"
+REQ-BE-010,데이터베이스 및 마이그레이션,REQ-BE-010-03,자동 스키마 동기화,"개발 환경에서 synchronize: true로 스키마 자동 업데이트. 운영에서는 false"
+REQ-BE-010,데이터베이스 및 마이그레이션,REQ-BE-010-04,사용자 역할 초기 설정,npm run migration:set-user-role 스크립트로 기존 사용자 기본 역할 할당
+REQ-BE-010,데이터베이스 및 마이그레이션,REQ-BE-010-05,슈퍼 관리자 생성,npm run create-super-admin 스크립트로 최초 슈퍼 관리자 계정 생성
+REQ-BE-011,글로벌 응답 및 예외 처리,REQ-BE-011-01,표준화된 응답 형식,"success, code, message, result 구조의 통일된 API 응답 형식"
+REQ-BE-011,글로벌 응답 및 예외 처리,REQ-BE-011-02,페이징 응답 구조,"result.page(total, perPage, currentPage, lastPage)와 result.list 구조"
+REQ-BE-011,글로벌 응답 및 예외 처리,REQ-BE-011-03,단일 데이터 응답 구조,단일 객체는 result.data 내부에 래핑하여 반환
+REQ-BE-011,글로벌 응답 및 예외 처리,REQ-BE-011-04,Transform Interceptor,모든 응답을 표준 형식으로 자동 변환하는 전역 인터셉터
+REQ-BE-011,글로벌 응답 및 예외 처리,REQ-BE-011-05,HTTP Exception Filter,모든 예외를 표준 에러 응답으로 변환하는 전역 필터
+REQ-BE-011,글로벌 응답 및 예외 처리,REQ-BE-011-06,한국 시간대 변환,"모든 날짜/시간은 Asia/Seoul 시간대로 변환 후 'yyyy-MM-dd HH:mm:ss' 형식으로 반환"
+REQ-BE-012,API 문서화,REQ-BE-012-01,Swagger 통합,"@ApiTags, @ApiOperation, @ApiResponse 데코레이터를 통한 자동 API 문서 생성"
+REQ-BE-012,API 문서화,REQ-BE-012-02,Swagger UI 제공,/docs 엔드포인트에서 Swagger UI 인터페이스 제공
+REQ-BE-012,API 문서화,REQ-BE-012-03,DTO 스키마 문서화,모든 입력/출력 DTO에 대한 스키마 및 예제 데이터 제공
+REQ-BE-012,API 문서화,REQ-BE-012-04,Bearer Token 인증,@ApiBearerAuth 데코레이터를 통한 JWT 인증 문서화
+REQ-BE-013,환경 설정 및 배포,REQ-BE-013-01,환경 변수 관리,"ConfigModule을 통한 전역 환경 변수 관리(DB 접속 정보, API 키 등)"
+REQ-BE-013,환경 설정 및 배포,REQ-BE-013-02,CORS 설정,"개발/운영 환경별 CORS 도메인 설정. 다중 오리진 지원"
+REQ-BE-013,환경 설정 및 배포,REQ-BE-013-03,SSL 설정,운영 환경에서 PostgreSQL SSL 연결 활성화
+REQ-BE-013,환경 설정 및 배포,REQ-BE-013-04,개발 도구 스크립트,"npm 스크립트를 통한 모듈 생성, 프로젝트 리네이밍, Git 리셋 도구 제공"
+REQ-BE-014,테스트 및 코드 품질,REQ-BE-014-01,단위 테스트,"Jest 기반 *.spec.ts 파일을 통한 서비스 및 컨트롤러 단위 테스트"
+REQ-BE-014,테스트 및 코드 품질,REQ-BE-014-02,E2E 테스트,Supertest를 활용한 실제 HTTP 요청 기반 통합 테스트
+REQ-BE-014,테스트 및 코드 품질,REQ-BE-014-03,코드 커버리지,Jest 커버리지 리포트를 통한 테스트 커버리지 측정
+REQ-BE-014,테스트 및 코드 품질,REQ-BE-014-04,ESLint 코드 검사,npm run lint 명령으로 코드 스타일 및 잠재적 오류 검사
+REQ-BE-014,테스트 및 코드 품질,REQ-BE-014-05,Prettier 코드 포맷팅,npm run format 명령으로 일관된 코드 포맷팅 적용
+REQ-BE-015,스케줄링 및 백그라운드 작업,REQ-BE-015-01,Cron 스케줄러,@nestjs/schedule을 통한 정기 작업 스케줄링
+REQ-BE-015,스케줄링 및 백그라운드 작업,REQ-BE-015-02,실시간 데이터 수집,업비트 API에서 정기적으로 최신 캔들 데이터 수집 및 클라이언트 전송
+REQ-BE-015,스케줄링 및 백그라운드 작업,REQ-BE-015-03,외부 API 연동 스케줄,"뉴스, 트위터, 유튜브 API 호출을 위한 스케줄 작업 (필요시)"
