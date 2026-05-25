@@ -31,7 +31,7 @@ import { User, XrpHolding, AppVersion, Keyword } from './entities';
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_DATABASE || 'xrp',
       entities: [User, XrpHolding, AppVersion, Keyword],
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: true,
       ssl: false,
     }),
     HttpModule,
