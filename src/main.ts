@@ -26,6 +26,7 @@ async function bootstrap() {
       'https://localhost:54851',
       'http://xrp-admin.kro.kr',
       'https://xrp-admin.kro.kr',
+      'http://127.0.0.1:3001',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
