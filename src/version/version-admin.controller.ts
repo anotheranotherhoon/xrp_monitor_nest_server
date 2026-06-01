@@ -102,7 +102,7 @@ export class VersionAdminController {
         result: {
           type: 'object',
           properties: {
-            data: {
+            list: {
               type: 'array',
               items: {
                 $ref: '#/components/schemas/VersionItemDto',
@@ -114,7 +114,7 @@ export class VersionAdminController {
     },
   })
   async getVersions(@Query('platform') platform?: string): Promise<{
-    data: any[];
+    list: any[];
   }> {
     const versions = await this.versionService.getVersions(platform);
     const list = versions.map((version) => ({
@@ -122,7 +122,7 @@ export class VersionAdminController {
       createdAt: this.formatToKoreanTime(version.createdAt),
       updatedAt: this.formatToKoreanTime(version.updatedAt),
     }));
-    return { data: list };
+    return { list };
   }
 
   @Put(':id')
