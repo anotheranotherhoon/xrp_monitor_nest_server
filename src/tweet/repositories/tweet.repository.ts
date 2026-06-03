@@ -22,7 +22,11 @@ export class TweetRepository {
     nextToken?: string;
   }) {
     const { userId, maxResults = 10, nextToken } = params;
-    const requestParams = { userId, maxResults, nextToken: nextToken ?? null };
+    const requestParams = {
+      userId,
+      maxResults,
+      ...(nextToken ? { nextToken } : {}),
+    };
     return this.withTwentyFourHourCache(
       'user-tweets',
       requestParams,
@@ -31,7 +35,7 @@ export class TweetRepository {
         const response$ = this.httpService.get(url, {
           params: {
             max_results: maxResults,
-            pagination_token: nextToken,
+            ...(nextToken ? { pagination_token: nextToken } : {}),
             'tweet.fields': 'created_at,author_id,lang',
           },
         });
@@ -47,7 +51,11 @@ export class TweetRepository {
     nextToken?: string;
   }) {
     const { query, maxResults = 10, nextToken } = params;
-    const requestParams = { query, maxResults, nextToken: nextToken ?? null };
+    const requestParams = {
+      query,
+      maxResults,
+      ...(nextToken ? { nextToken } : {}),
+    };
     return this.withTwentyFourHourCache(
       'search-recent',
       requestParams,
@@ -57,7 +65,7 @@ export class TweetRepository {
           params: {
             query,
             max_results: maxResults,
-            next_token: nextToken,
+            ...(nextToken ? { next_token: nextToken } : {}),
             'tweet.fields': 'created_at,author_id,lang',
           },
         });
@@ -96,26 +104,8 @@ export class TweetRepository {
       if (cached) {
         return cached.tcResponseBody as T;
       }
-      if (this.isExternalApiError(error)) {
-        return this.createEmptyTwitterResponse() as T;
-      }
       throw error;
     }
-  }
-
-  private isExternalApiError(error: unknown): boolean {
-    const status = (error as { response?: { status?: number } })?.response
-      ?.status;
-    return typeof status === 'number' && status >= 400;
-  }
-
-  private createEmptyTwitterResponse(): Record<string, unknown> {
-    return {
-      data: [],
-      meta: {
-        result_count: 0,
-      },
-    };
   }
 
   private isFresh(fetchedAt: Date): boolean {
