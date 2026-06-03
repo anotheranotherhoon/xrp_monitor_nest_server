@@ -49,7 +49,7 @@ export class NaverNewsInfiniteResponseDto extends NaverNewsResponseDto {
   @ApiProperty({
     example: 11,
     nullable: true,
-    description: '다음 호출에 사용할 cursorId(없으면 null)',
+    description: '다음 호출에 사용할 nextCursor(없으면 null)',
   })
-  nextCursorId: number | null;
+  nextCursor: number | null;
 }

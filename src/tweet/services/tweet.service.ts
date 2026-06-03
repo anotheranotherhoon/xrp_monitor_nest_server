@@ -8,6 +8,7 @@ export class TweetService {
   async getUserTweets(options: {
     userId: string;
     maxResults?: number;
+    nextToken?: string;
   }): Promise<any> {
     return this.tweetRepository.getUserTweets(options);
   }

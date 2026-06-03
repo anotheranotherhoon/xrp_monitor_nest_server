@@ -18,6 +18,17 @@ import {
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
+  private parseBoundedInt(
+    value: string | number | undefined,
+    defaultValue: number,
+    maxValue: number,
+  ): number {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 && parsed <= maxValue
+      ? parsed
+      : defaultValue;
+  }
+
   private formatToKoreanTime(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -42,13 +53,20 @@ export class NewsController {
     name: 'cursorId',
     required: true,
     example: -1,
-    description: '첫 호출은 -1, 이후에는 응답의 nextCursorId 사용',
+    description: '첫 호출은 -1, 이후에는 응답의 nextCursor 사용',
+  })
+  @ApiQuery({
+    name: 'perPage',
+    required: false,
+    example: 10,
+    description: '페이지당 항목 수(1-100), 기본 10',
   })
   @ApiQuery({
     name: 'display',
     required: false,
     example: 10,
-    description: '한 번에 가져올 개수(1-100), 기본 10',
+    description: '기존 호출 호환용. 신규 호출은 perPage 사용',
+    deprecated: true,
   })
   @ApiQuery({
     name: 'sort',
@@ -58,29 +76,33 @@ export class NewsController {
     description: '정렬 방식, 기본 date',
   })
   async getXrpNews(
-    @Query('display') display?: number,
+    @Query('perPage') perPage?: string,
+    @Query('display') display?: string,
     @Query('sort') sort?: string,
-    @Query('cursorId') cursorId?: number,
+    @Query('cursorId') cursorId?: string,
   ): Promise<NewsPaginatedResultDto> {
     try {
-      // display 파라미터 검증 (1-100 사이)
-      const validDisplay =
-        display && display > 0 && display <= 100 ? display : 10;
+      const validPerPage = this.parseBoundedInt(perPage ?? display, 10, 100);
 
       // sort 파라미터 검증 (date, sim)
       const validSort = sort === 'sim' ? 'sim' : 'date';
 
       // 커서 규칙: 첫 호출은 cursorId = -1 → start = 1로 매핑
+      const parsedCursor = Number(cursorId);
       const validStart =
-        cursorId === -1 ? 1 : cursorId && cursorId > 0 ? cursorId : 1;
+        parsedCursor === -1
+          ? 1
+          : Number.isInteger(parsedCursor) && parsedCursor > 0
+            ? parsedCursor
+            : 1;
       const data = await this.newsService.getXrpNews(
-        validDisplay,
+        validPerPage,
         validSort,
         validStart,
       );
 
       const hasMore = data.start + data.display <= data.total;
-      const nextCursorId = hasMore ? data.start + data.display : null;
+      const nextCursor = hasMore ? data.start + data.display : null;
 
       const currentPage = Math.ceil(data.start / data.display);
       const lastPage = Math.ceil(data.total / data.display);
@@ -94,7 +116,7 @@ export class NewsController {
       }));
 
       return {
-        nextCursor: nextCursorId,
+        nextCursor: nextCursor,
         page: {
           total: data.total,
           perPage: data.display,
@@ -119,16 +141,47 @@ export class NewsController {
     type: NewsPaginatedResponseDto,
     description: 'XRP 뉴스 목록 조회 (offset 방식)',
   })
+  @ApiQuery({
+    name: 'offset',
+    required: false,
+    example: 0,
+    description: '0부터 시작하는 오프셋',
+  })
+  @ApiQuery({
+    name: 'perPage',
+    required: false,
+    example: 10,
+    description: '페이지당 항목 수(1-100), 기본 10',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    example: 10,
+    description: '기존 호출 호환용. 신규 호출은 perPage 사용',
+    deprecated: true,
+  })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    example: 'date',
+    enum: ['date', 'sim'],
+    description: '정렬 방식, 기본 date',
+  })
   async getXrpNewsByOffset(
-    @Query('offset') offset?: number,
-    @Query('limit') limit?: number,
+    @Query('offset') offset?: string,
+    @Query('perPage') perPage?: string,
+    @Query('limit') limit?: string,
     @Query('sort') sort?: string,
   ): Promise<NewsPaginatedResultDto> {
     try {
-      const validLimit = limit && limit > 0 && limit <= 100 ? limit : 10;
+      const validLimit = this.parseBoundedInt(perPage ?? limit, 10, 100);
       const validSort = sort === 'sim' ? 'sim' : 'date';
       // Naver API start는 1-base. offset이 0-base라고 가정하여 +1
-      const startFromOffset = (offset && offset >= 0 ? offset : 0) + 1;
+      const parsedOffset = Number(offset);
+      const startFromOffset =
+        (Number.isInteger(parsedOffset) && parsedOffset >= 0
+          ? parsedOffset
+          : 0) + 1;
 
       const data = await this.newsService.getXrpNews(
         validLimit,

@@ -8,13 +8,13 @@ export class CursorPageDto<TItem> {
     example: 'CAoQAA',
     description: '다음 호출에 사용할 커서(없으면 null)',
   } as any)
-  nextCursorId: string | number | null;
+  nextCursor: string | number | null;
 
   @ApiProperty({
     example: 10,
-    description: '이번 응답의 아이템 개수(요청 maxResults/display 등)',
+    description: '페이지당 항목 수',
   })
-  pageSize: number;
+  perPage: number;
 
   @ApiProperty({
     example: 1234,
@@ -24,5 +24,5 @@ export class CursorPageDto<TItem> {
   total?: number;
 
   @ApiProperty({ isArray: true })
-  items: TItem[];
+  list: TItem[];
 }

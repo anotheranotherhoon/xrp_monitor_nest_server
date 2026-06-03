@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ResponseDto } from './response.dto';
 
 export class PageInfoDto {
   @ApiProperty({ example: 100, description: '전체 항목 수' })
@@ -25,7 +26,9 @@ export class PaginatedResultDto<T> {
   list: T[];
 }
 
-export class PaginatedResponseDto<T> {
+export class PaginatedResponseDto<T> extends ResponseDto<
+  PaginatedResultDto<T>
+> {
   @ApiProperty({ type: PaginatedResultDto })
   result: PaginatedResultDto<T>;
 }

@@ -219,6 +219,23 @@ git push origin master
 
 Swagger UI: https://xrp-monitor.p-e.kr/docs
 
+### 목록 API 포맷
+
+목록 API는 요청/응답 포맷을 아래 기준으로 통일합니다.
+
+```http
+GET /news/xrp/cursor?cursorId=-1&perPage=10
+GET /youtube/search?cursorId=-1&perPage=10&q=XRP%20Ripple
+GET /tweet/users/25073877/tweets?cursorId=-1&perPage=10
+GET /admin/users?page=1&perPage=10&role=USER
+```
+
+- 첫 요청은 `cursorId=-1`을 사용합니다.
+- 다음 요청은 이전 응답의 `result.nextCursor` 값을 `cursorId`로 전달합니다.
+- 페이지 크기는 `perPage`를 사용합니다. `display`, `maxResults`, `max_results`, `next_token`, `limit`는 기존 호출 호환용입니다.
+- 커서형 응답은 `result.nextCursor`, `result.page.perPage`, `result.list`를 사용합니다.
+- 페이지형 응답은 `result.page`, `result.list`를 사용합니다.
+
 ### 주요 엔드포인트
 
 | Method | Endpoint           | 설명                  |

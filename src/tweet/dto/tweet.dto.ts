@@ -24,10 +24,10 @@ export class TweetListResponseDto {
     example: 'b26v89c19zqg8o3fosdf',
     description: '다음 페이지 호출에 사용할 커서(없으면 null)',
   })
-  nextCursorId: string | null;
+  nextCursor: string | null;
 
-  @ApiProperty({ example: 10, description: '이번 응답의 아이템 개수' })
-  pageSize: number;
+  @ApiProperty({ example: 10, description: '페이지당 아이템 개수' })
+  perPage: number;
 
   @ApiProperty({
     example: 1234,
@@ -37,5 +37,5 @@ export class TweetListResponseDto {
   total?: number;
 
   @ApiProperty({ isArray: true, type: TweetItemDto })
-  items: TweetItemDto[];
+  list: TweetItemDto[];
 }

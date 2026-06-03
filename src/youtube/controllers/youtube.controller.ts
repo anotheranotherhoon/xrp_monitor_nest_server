@@ -18,6 +18,17 @@ import {
 export class YoutubeController {
   constructor(private readonly youtubeService: YoutubeService) {}
 
+  private parseBoundedInt(
+    value: string | undefined,
+    defaultValue: number,
+    maxValue: number,
+  ): number {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 && parsed <= maxValue
+      ? parsed
+      : defaultValue;
+  }
+
   private formatToKoreanTime(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -51,16 +62,23 @@ export class YoutubeController {
     enum: ['date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'],
   })
   @ApiQuery({
+    name: 'perPage',
+    required: false,
+    example: 10,
+    description: '페이지당 항목 수(1-50), 기본 10',
+  })
+  @ApiQuery({
     name: 'maxResults',
     required: false,
     example: 10,
-    description: '가져올 개수(최대 50)',
+    description: '기존 호출 호환용. 신규 호출은 perPage 사용',
+    deprecated: true,
   })
   @ApiQuery({
     name: 'cursorId',
     required: false,
     example: '-1',
-    description: '첫 호출은 -1, 이후 응답의 nextCursorId 사용',
+    description: '첫 호출은 -1, 이후 응답의 nextCursor 사용',
   })
   async search(
     @Query('q') q?: string,
@@ -72,17 +90,17 @@ export class YoutubeController {
       | 'title'
       | 'videoCount'
       | 'viewCount',
-    @Query('maxResults') maxResults?: number,
+    @Query('perPage') perPage?: string,
+    @Query('maxResults') maxResults?: string,
     @Query('cursorId') cursorId?: string,
   ): Promise<YoutubePaginatedResultDto> {
     try {
       const query = q && q.trim().length > 0 ? q : 'XRP Ripple';
-      const validMax =
-        maxResults && +maxResults > 0 && +maxResults <= 50 ? +maxResults : 10;
+      const validPerPage = this.parseBoundedInt(perPage ?? maxResults, 10, 50);
       const raw = await this.youtubeService.searchXrpVideos({
         query,
         order: order || 'date',
-        maxResults: validMax,
+        maxResults: validPerPage,
         pageToken: cursorId && cursorId !== '-1' ? cursorId : undefined,
       });
       const items: YoutubeSearchItemDto[] = (raw?.items || [])
@@ -99,15 +117,15 @@ export class YoutubeController {
 
       const pageInfo = raw?.pageInfo || {};
       const total = pageInfo?.totalResults || items.length;
-      const perPage = pageInfo?.resultsPerPage || items.length;
+      const responsePerPage = pageInfo?.resultsPerPage || validPerPage;
       const currentPage = 1;
-      const lastPage = Math.max(1, Math.ceil(total / perPage));
+      const lastPage = Math.max(1, Math.ceil(total / responsePerPage));
 
       return {
         nextCursor: raw?.nextPageToken ?? null,
         page: {
           total: total,
-          perPage: perPage,
+          perPage: responsePerPage,
           currentPage: currentPage,
           lastPage: lastPage,
         },

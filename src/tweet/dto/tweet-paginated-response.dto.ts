@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PageInfoDto } from 'src/common/dto/paginated-response.dto';
+import { ResponseDto } from 'src/common/dto/response.dto';
 import { TweetItemDto } from './tweet.dto';
 
 export class TweetPaginatedResultDto {
   @ApiProperty({
     example: 'b26v89c19zqg8o3fosdf',
-    description: '다음 커서 ID',
+    description: '다음 호출에 사용할 커서(없으면 null)',
     nullable: true,
   })
   nextCursor?: number | string | null;
@@ -17,7 +18,7 @@ export class TweetPaginatedResultDto {
   list: TweetItemDto[];
 }
 
-export class TweetPaginatedResponseDto {
+export class TweetPaginatedResponseDto extends ResponseDto<TweetPaginatedResultDto> {
   @ApiProperty({ type: TweetPaginatedResultDto })
   result: TweetPaginatedResultDto;
 }

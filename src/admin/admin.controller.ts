@@ -55,11 +55,19 @@ export class AdminController {
     type: 'number',
   })
   @ApiQuery({
-    name: 'limit',
+    name: 'perPage',
     required: false,
     example: 10,
     description: '페이지당 항목 수 - 기본값: 10',
     type: 'number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    example: 10,
+    description: '기존 호출 호환용. 신규 호출은 perPage 사용',
+    type: 'number',
+    deprecated: true,
   })
   @ApiQuery({
     name: 'role',
@@ -84,57 +92,52 @@ export class AdminController {
         result: {
           type: 'object',
           properties: {
-            data: {
+            page: {
               type: 'object',
               properties: {
-                page: {
-                  type: 'object',
-                  properties: {
-                    total: {
-                      type: 'number',
-                      example: 50,
-                      description: '전체 사용자 수',
-                    },
-                    perPage: {
-                      type: 'number',
-                      example: 10,
-                      description: '페이지당 아이템 수',
-                    },
-                    currentPage: {
-                      type: 'number',
-                      example: 1,
-                      description: '현재 페이지',
-                    },
-                    lastPage: {
-                      type: 'number',
-                      example: 5,
-                      description: '마지막 페이지',
-                    },
-                  },
+                total: {
+                  type: 'number',
+                  example: 50,
+                  description: '전체 사용자 수',
                 },
-                list: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      meIdx: { type: 'number', example: 1 },
-                      meEmail: { type: 'string', example: 'user@example.com' },
-                      meNickname: { type: 'string', example: '사용자' },
-                      meIsActive: { type: 'boolean', example: true },
-                      meRole: {
-                        type: 'string',
-                        example: 'USER',
-                        enum: ['USER', 'ADMIN', 'SUPER_ADMIN'],
-                      },
-                      createdAt: {
-                        type: 'string',
-                        example: '2025-10-12T15:30:00.000Z',
-                      },
-                      updatedAt: {
-                        type: 'string',
-                        example: '2025-10-12T15:30:00.000Z',
-                      },
-                    },
+                perPage: {
+                  type: 'number',
+                  example: 10,
+                  description: '페이지당 아이템 수',
+                },
+                currentPage: {
+                  type: 'number',
+                  example: 1,
+                  description: '현재 페이지',
+                },
+                lastPage: {
+                  type: 'number',
+                  example: 5,
+                  description: '마지막 페이지',
+                },
+              },
+            },
+            list: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  meIdx: { type: 'number', example: 1 },
+                  meEmail: { type: 'string', example: 'user@example.com' },
+                  meNickname: { type: 'string', example: '사용자' },
+                  meIsActive: { type: 'boolean', example: true },
+                  meRole: {
+                    type: 'string',
+                    example: 'USER',
+                    enum: ['USER', 'ADMIN', 'SUPER_ADMIN'],
+                  },
+                  createdAt: {
+                    type: 'string',
+                    example: '2025-10-12T15:30:00.000Z',
+                  },
+                  updatedAt: {
+                    type: 'string',
+                    example: '2025-10-12T15:30:00.000Z',
                   },
                 },
               },
@@ -170,12 +173,13 @@ export class AdminController {
   })
   async getUsers(
     @Query('page') page: string = '1',
+    @Query('perPage') perPage?: string,
     @Query('limit') limit: string = '10',
     @Query('role') role?: string,
   ) {
     const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 10;
-    return await this.adminService.getUsers(pageNum, limitNum, role);
+    const perPageNum = parseInt(perPage ?? limit, 10) || 10;
+    return await this.adminService.getUsers(pageNum, perPageNum, role);
   }
 
   @Get('users/:id')

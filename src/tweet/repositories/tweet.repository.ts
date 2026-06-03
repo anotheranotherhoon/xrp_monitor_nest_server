@@ -16,9 +16,13 @@ export class TweetRepository {
     private readonly tweetCacheRepository: Repository<TweetCache>,
   ) {}
 
-  async getUserTweets(params: { userId: string; maxResults?: number }) {
-    const { userId, maxResults = 10 } = params;
-    const requestParams = { userId, maxResults };
+  async getUserTweets(params: {
+    userId: string;
+    maxResults?: number;
+    nextToken?: string;
+  }) {
+    const { userId, maxResults = 10, nextToken } = params;
+    const requestParams = { userId, maxResults, nextToken: nextToken ?? null };
     return this.withTwentyFourHourCache(
       'user-tweets',
       requestParams,
@@ -27,6 +31,7 @@ export class TweetRepository {
         const response$ = this.httpService.get(url, {
           params: {
             max_results: maxResults,
+            pagination_token: nextToken,
             'tweet.fields': 'created_at,author_id,lang',
           },
         });

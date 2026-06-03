@@ -19,6 +19,17 @@ import {
 export class TweetController {
   constructor(private readonly tweetService: TweetService) {}
 
+  private parseBoundedInt(
+    value: string | undefined,
+    defaultValue: number,
+    maxValue: number,
+  ): number {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 && parsed <= maxValue
+      ? parsed
+      : defaultValue;
+  }
+
   private formatToKoreanTime(dateString: string): string {
     if (!dateString) return '';
     try {
@@ -42,21 +53,41 @@ export class TweetController {
 
   @Get('users/:id/tweets')
   @ApiParam({ name: 'id', example: '25073877', description: 'Twitter user id' })
-  @ApiQuery({ name: 'max_results', required: false, example: 10 })
+  @ApiQuery({
+    name: 'perPage',
+    required: false,
+    example: 10,
+    description: '페이지당 항목 수(1-100), 기본 10',
+  })
+  @ApiQuery({
+    name: 'max_results',
+    required: false,
+    example: 10,
+    description: '기존 호출 호환용. 신규 호출은 perPage 사용',
+    deprecated: true,
+  })
+  @ApiQuery({
+    name: 'cursorId',
+    required: false,
+    example: '-1',
+    description: '첫 호출은 -1, 이후 응답의 nextCursor 사용',
+  })
   @ApiOkResponse({
     type: TweetPaginatedResponseDto,
     description: '특정 유저의 최근 트윗',
   })
   async getUserTweets(
     @Param('id') id: string,
-    @Query('max_results') maxResults?: number,
+    @Query('perPage') perPage?: string,
+    @Query('max_results') maxResults?: string,
+    @Query('cursorId') cursorId?: string,
   ): Promise<TweetPaginatedResultDto> {
     try {
-      const validMax =
-        maxResults && +maxResults > 0 && +maxResults <= 100 ? +maxResults : 10;
+      const validPerPage = this.parseBoundedInt(perPage ?? maxResults, 10, 100);
       const raw = await this.tweetService.getUserTweets({
         userId: id,
-        maxResults: validMax,
+        maxResults: validPerPage,
+        nextToken: cursorId && cursorId !== '-1' ? cursorId : undefined,
       });
       const items: TweetItemDto[] = (raw?.data || []).map((it: any) => ({
         twId: it?.id,
@@ -67,15 +98,15 @@ export class TweetController {
         twLang: it?.lang,
       }));
       const total = raw?.meta?.result_count || items.length;
-      const perPage = validMax;
+      const responsePerPage = validPerPage;
       const currentPage = 1;
-      const lastPage = Math.max(1, Math.ceil(total / perPage));
+      const lastPage = Math.max(1, Math.ceil(total / responsePerPage));
 
       return {
         nextCursor: raw?.meta?.next_token ?? null,
         page: {
           total: total,
-          perPage: perPage,
+          perPage: responsePerPage,
           currentPage: currentPage,
           lastPage: lastPage,
         },
@@ -92,16 +123,41 @@ export class TweetController {
 
   @Get('search/recent')
   @ApiQuery({ name: 'query', required: true, example: 'xrp' })
-  @ApiQuery({ name: 'max_results', required: false, example: 10 })
-  @ApiQuery({ name: 'next_token', required: false, example: undefined })
+  @ApiQuery({
+    name: 'perPage',
+    required: false,
+    example: 10,
+    description: '페이지당 항목 수(1-100), 기본 10',
+  })
+  @ApiQuery({
+    name: 'max_results',
+    required: false,
+    example: 10,
+    description: '기존 호출 호환용. 신규 호출은 perPage 사용',
+    deprecated: true,
+  })
+  @ApiQuery({
+    name: 'cursorId',
+    required: false,
+    example: '-1',
+    description: '첫 호출은 -1, 이후 응답의 nextCursor 사용',
+  })
+  @ApiQuery({
+    name: 'next_token',
+    required: false,
+    example: undefined,
+    description: '기존 호출 호환용. 신규 호출은 cursorId 사용',
+  })
   @ApiOkResponse({
     type: TweetPaginatedResponseDto,
     description: '트윗 최근 검색',
   })
   async searchRecent(
     @Query('query') query: string,
-    @Query('max_results') maxResults?: number,
+    @Query('perPage') perPage?: string,
+    @Query('max_results') maxResults?: string,
     @Query('next_token') nextToken?: string,
+    @Query('cursorId') cursorId?: string,
   ): Promise<TweetPaginatedResultDto> {
     try {
       if (!query || query.trim().length === 0) {
@@ -110,12 +166,13 @@ export class TweetController {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const validMax =
-        maxResults && +maxResults > 0 && +maxResults <= 100 ? +maxResults : 10;
+      const validPerPage = this.parseBoundedInt(perPage ?? maxResults, 10, 100);
+      const effectiveNextToken =
+        nextToken || (cursorId && cursorId !== '-1' ? cursorId : undefined);
       const raw = await this.tweetService.searchRecent({
         query,
-        maxResults: validMax,
-        nextToken,
+        maxResults: validPerPage,
+        nextToken: effectiveNextToken,
       });
       const items: TweetItemDto[] = (raw?.data || []).map((it: any) => ({
         twId: it?.id,
@@ -126,15 +183,15 @@ export class TweetController {
         twLang: it?.lang,
       }));
       const total = raw?.meta?.result_count || items.length;
-      const perPage = validMax;
+      const responsePerPage = validPerPage;
       const currentPage = 1;
-      const lastPage = Math.max(1, Math.ceil(total / perPage));
+      const lastPage = Math.max(1, Math.ceil(total / responsePerPage));
 
       return {
         nextCursor: raw?.meta?.next_token ?? null,
         page: {
           total: total,
-          perPage: perPage,
+          perPage: responsePerPage,
           currentPage: currentPage,
           lastPage: lastPage,
         },
