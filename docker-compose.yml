@@ -22,12 +22,12 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_DATABASE: xrp
-      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       NODE_ENV: production
-      YOUTUBE_API_KEY: AIzaSyCSTZUuqKrzT7UK5M6EaPtTFhBo3QSYf_4
-      NAVER_CLIENT_ID: F7hqqLA3DynrEhbzts5z
-      NAVER_CLIENT_SECRET_KEY: B5Gqsq8zwm
-      X_BEARER_TOKEN: AAAAAAAAAAAAAAAAAAAAAHYF4AEAAAAAN57xRJ0rx5lTNprFpuqlyu0GM3A%3DoOqRBgMkeUOlvEKsvdnsioflueYQ0hD9tSVzFPWMH7g8ErRfIc%
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY:?YOUTUBE_API_KEY is required}
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID:?NAVER_CLIENT_ID is required}
+      NAVER_CLIENT_SECRET_KEY: ${NAVER_CLIENT_SECRET_KEY:?NAVER_CLIENT_SECRET_KEY is required}
+      X_BEARER_TOKEN: ${X_BEARER_TOKEN:?X_BEARER_TOKEN is required}
     depends_on:
       - db
     restart: always
