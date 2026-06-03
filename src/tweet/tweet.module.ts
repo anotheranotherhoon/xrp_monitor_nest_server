@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TweetCache } from 'src/entities';
 import { TweetController } from './controllers/tweet.controller';
 import { TweetService } from './services/tweet.service';
 import { TweetRepository } from './repositories/tweet.repository';
@@ -8,6 +10,7 @@ import { TweetRepository } from './repositories/tweet.repository';
 @Module({
   imports: [
     ConfigModule,
+    TypeOrmModule.forFeature([TweetCache]),
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
