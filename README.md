@@ -152,6 +152,7 @@ YOUTUBE_API_KEY=your-youtube-api-key
 NAVER_CLIENT_ID=your-naver-client-id
 NAVER_CLIENT_SECRET_KEY=your-naver-secret-key
 X_BEARER_TOKEN=your-twitter-bearer-token
+CRYPTO_COMPARE=your-cryptocompare-api-key
 ```
 
 ### 4. 서버 실행
@@ -227,6 +228,7 @@ Swagger UI: https://xrp-monitor.p-e.kr/docs
 GET /news/xrp/cursor?cursorId=-1&perPage=10
 GET /youtube/search?cursorId=-1&perPage=10&q=XRP%20Ripple
 GET /tweet/users/25073877/tweets?cursorId=-1&perPage=10
+GET /crypto/news/xrp?cursorId=-1&perPage=10
 GET /admin/users?page=1&perPage=10&role=USER
 ```
 

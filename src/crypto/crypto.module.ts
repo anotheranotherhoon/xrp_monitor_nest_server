@@ -3,9 +3,9 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TweetCache } from 'src/entities';
-import { TweetController } from './controllers/tweet.controller';
-import { TweetService } from './services/tweet.service';
-import { TweetRepository } from './repositories/tweet.repository';
+import { CryptoController } from './controllers/crypto.controller';
+import { CryptoService } from './services/crypto.service';
+import { CryptoRepository } from './repositories/crypto.repository';
 
 @Module({
   imports: [
@@ -14,17 +14,16 @@ import { TweetRepository } from './repositories/tweet.repository';
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        baseURL: 'https://api.x.com/2/',
+        baseURL: 'https://min-api.cryptocompare.com',
         timeout: 10000,
-        headers: {
-          Authorization: `Bearer ${configService.get<string>('X_BEARER_TOKEN')}`,
+        params: {
+          api_key: configService.get<string>('CRYPTO_COMPARE'),
         },
       }),
       inject: [ConfigService],
     }),
   ],
-  controllers: [TweetController],
-  providers: [TweetService, TweetRepository],
-  exports: [TweetService],
+  controllers: [CryptoController],
+  providers: [CryptoService, CryptoRepository],
 })
-export class TweetModule {}
+export class CryptoModule {}

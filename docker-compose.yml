@@ -28,6 +28,7 @@ services:
       NAVER_CLIENT_ID: ${NAVER_CLIENT_ID:?NAVER_CLIENT_ID is required}
       NAVER_CLIENT_SECRET_KEY: ${NAVER_CLIENT_SECRET_KEY:?NAVER_CLIENT_SECRET_KEY is required}
       X_BEARER_TOKEN: ${X_BEARER_TOKEN:?X_BEARER_TOKEN is required}
+      CRYPTO_COMPARE: ${CRYPTO_COMPARE:?CRYPTO_COMPARE is required}
     depends_on:
       - db
     restart: always

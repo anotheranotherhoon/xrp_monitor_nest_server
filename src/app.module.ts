@@ -15,6 +15,7 @@ import { XrpModule } from './xrp/xrp.module';
 import { VersionModule } from './version/version.module';
 import { AdminModule } from './admin/admin.module';
 import { KeywordModule } from './keyword/keyword.module';
+import { CryptoModule } from './crypto/crypto.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { User, XrpHolding, AppVersion, Keyword, TweetCache } from './entities';
 
@@ -40,6 +41,7 @@ import { User, XrpHolding, AppVersion, Keyword, TweetCache } from './entities';
     NewsModule,
     YoutubeModule,
     TweetModule,
+    CryptoModule,
     UpbitModule,
     XrpModule,
     VersionModule,
