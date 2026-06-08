@@ -26,10 +26,10 @@ async function createSuperAdmin() {
 
     const userRepository = dataSource.getRepository(User);
 
-    // 슈퍼관리자 정보
-    const email = 'superadmin@xrpmonitor.com';
-    const password = 'superadmin123!';
-    const nickname = '슈퍼관리자';
+    const email = process.env.SUPER_ADMIN_EMAIL || 'superadmin@xrpmonitor.com';
+    const password = process.env.SUPER_ADMIN_PASSWORD || 'superadmin123';
+    const nickname = process.env.SUPER_ADMIN_NICKNAME || '슈퍼관리자';
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // 기존 슈퍼관리자 확인
     const existingAdmin = await userRepository.findOne({
@@ -37,14 +37,14 @@ async function createSuperAdmin() {
     });
 
     if (existingAdmin) {
-      console.log('슈퍼관리자가 이미 존재합니다. 권한을 업데이트합니다.');
+      console.log('슈퍼관리자가 이미 존재합니다. 계정 정보를 업데이트합니다.');
+      existingAdmin.mePassword = hashedPassword;
+      existingAdmin.meNickname = nickname;
       existingAdmin.meRole = UserRole.SUPER_ADMIN;
+      existingAdmin.meIsActive = true;
       await userRepository.save(existingAdmin);
-      console.log('슈퍼관리자 권한이 업데이트되었습니다.');
+      console.log('슈퍼관리자 계정 정보가 업데이트되었습니다.');
     } else {
-      // 비밀번호 해시화
-      const hashedPassword = await bcrypt.hash(password, 12);
-
       // 슈퍼관리자 생성
       const superAdmin = userRepository.create({
         meEmail: email,

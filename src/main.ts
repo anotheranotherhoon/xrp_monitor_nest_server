@@ -8,26 +8,28 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS 설정
+  const configuredOrigins = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const allowedOrigins = new Set([
+    ...configuredOrigins,
+    'http://xrp-admin.p-e.kr',
+    'https://xrp-admin.p-e.kr',
+  ]);
+
   app.enableCors({
-    origin: [
-      'http://localhost:58179',
-      'http://localhost:56522',
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:8080',
-      'http://192.168.219.100:3000',
-      'http://192.168.219.103:3000',
-      'https://localhost:58179',
-      'https://localhost:56522',
-      'https://localhost:3000',
-      'https://localhost:3001',
-      'https://localhost:8080',
-      'https://localhost:54851',
-      'http://xrp-admin.p-e.kr',
-      'https://xrp-admin.p-e.kr',
-      'http://127.0.0.1:3001',
-    ],
+    origin: (origin, callback) => {
+      const isLocalOrigin =
+        origin === undefined ||
+        /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/.test(origin);
+      callback(
+        isLocalOrigin || allowedOrigins.has(origin)
+          ? null
+          : new Error(`CORS origin is not allowed: ${origin}`),
+        isLocalOrigin || allowedOrigins.has(origin),
+      );
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',

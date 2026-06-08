@@ -15,7 +15,7 @@ services:
     build: .
     container_name: nestjs
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -29,6 +29,11 @@ services:
       NAVER_CLIENT_SECRET_KEY: ${NAVER_CLIENT_SECRET_KEY:?NAVER_CLIENT_SECRET_KEY is required}
       X_BEARER_TOKEN: ${X_BEARER_TOKEN:?X_BEARER_TOKEN is required}
       CRYPTO_COMPARE: ${CRYPTO_COMPARE:?CRYPTO_COMPARE is required}
+      OBJECT_STORAGE_DRIVER: oci
+      OCI_AUTH_MODE: ${OCI_AUTH_MODE:-instance_principal}
+      OCI_REGION: ${OCI_REGION:-ap-chuncheon-1}
+      OCI_OBJECT_STORAGE_NAMESPACE: ${OCI_OBJECT_STORAGE_NAMESPACE:?OCI_OBJECT_STORAGE_NAMESPACE is required}
+      OCI_OBJECT_STORAGE_BUCKET: ${OCI_OBJECT_STORAGE_BUCKET:?OCI_OBJECT_STORAGE_BUCKET is required}
     depends_on:
       - db
     restart: always

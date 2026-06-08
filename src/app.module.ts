@@ -17,7 +17,15 @@ import { AdminModule } from './admin/admin.module';
 import { KeywordModule } from './keyword/keyword.module';
 import { CryptoModule } from './crypto/crypto.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { User, XrpHolding, AppVersion, Keyword, TweetCache } from './entities';
+import {
+  User,
+  XrpHolding,
+  AppVersion,
+  Keyword,
+  TweetCache,
+  Popup,
+} from './entities';
+import { PopupModule } from './popup/popup.module';
 
 @Module({
   imports: [
@@ -31,7 +39,7 @@ import { User, XrpHolding, AppVersion, Keyword, TweetCache } from './entities';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_DATABASE || 'xrp',
-      entities: [User, XrpHolding, AppVersion, Keyword, TweetCache],
+      entities: [User, XrpHolding, AppVersion, Keyword, TweetCache, Popup],
       synchronize: true,
       ssl: false,
     }),
@@ -47,6 +55,7 @@ import { User, XrpHolding, AppVersion, Keyword, TweetCache } from './entities';
     VersionModule,
     AdminModule,
     KeywordModule,
+    PopupModule,
   ],
   controllers: [AppController],
   providers: [
