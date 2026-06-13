@@ -20,9 +20,20 @@ jobs:
           username: ${{ secrets.OCI_USERNAME }}
           key: ${{ secrets.OCI_SSH_KEY }}
           command_timeout: 30m
+          script_stop: true
           script: |
             cd ~/app
             git pull origin master
             export CRYPTO_COMPARE='${{ secrets.CRYPTO_COMPARE }}'
             docker-compose config --quiet
             docker-compose up -d --build --remove-orphans
+            for attempt in $(seq 1 30); do
+              if curl --fail --silent http://localhost:3000/health > /dev/null; then
+                docker-compose ps
+                exit 0
+              fi
+              sleep 5
+            done
+            docker-compose ps
+            docker-compose logs --tail=200 app
+            exit 1
