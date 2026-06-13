@@ -145,22 +145,16 @@ src/
 ```env
 OCI_AUTH_MODE=instance_principal
 OCI_REGION=ap-chuncheon-1
-OCI_OBJECT_STORAGE_NAMESPACE=your-namespace
 OCI_OBJECT_STORAGE_BUCKET=xrp-monitor-popup
 ```
 
 VM이 속한 Dynamic Group에는 대상 Bucket의 Object를 관리할 수 있는 IAM
 Policy가 필요합니다. 로컬 개발에서는 `OCI_AUTH_MODE=config`와 OCI CLI
-설정 파일을 사용할 수 있습니다.
-
-GitHub Actions 저장소 Secret에도 다음 값을 등록해야 합니다.
-
-- `OCI_OBJECT_STORAGE_NAMESPACE`
-- `OCI_OBJECT_STORAGE_BUCKET`
+설정 파일을 사용할 수 있습니다. `OCI_OBJECT_STORAGE_NAMESPACE`를 생략하면
+OCI SDK가 인증된 tenancy의 namespace를 자동 조회합니다.
 
 운영 배포에서는 Docker 컨테이너가 `OBJECT_STORAGE_DRIVER=oci`와 Instance
-Principal 인증을 사용합니다. `master` 브랜치 배포 시 GitHub Actions가
-Object Storage Secret을 OCI VM의 Docker Compose 실행 환경에 전달합니다.
+Principal 인증을 사용하며 기본 Bucket은 `xrp-monitor-popup`입니다.
 
 ### 사전 요구사항
 

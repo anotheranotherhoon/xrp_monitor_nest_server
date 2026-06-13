@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { mkdtemp, rm } from 'fs/promises';
+import { ObjectStorageClient } from 'oci-objectstorage';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { Readable } from 'stream';
@@ -47,6 +48,50 @@ describe('ObjectStorageService local driver', () => {
     await expect(
       readStream(missingObject.value as Readable),
     ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+});
+
+describe('ObjectStorageService OCI driver', () => {
+  it('discovers and caches the namespace when it is not configured', async () => {
+    const values: Record<string, string> = {
+      OBJECT_STORAGE_DRIVER: 'oci',
+      OCI_OBJECT_STORAGE_BUCKET: 'xrp-monitor-popup',
+    };
+    const configService = {
+      get: jest.fn((key: string) => values[key]),
+    } as unknown as ConfigService;
+    const client = {
+      getNamespace: jest
+        .fn()
+        .mockResolvedValue({ value: 'resolved-namespace' }),
+      putObject: jest.fn().mockResolvedValue({}),
+      close: jest.fn(),
+    } as unknown as ObjectStorageClient;
+    const service = new ObjectStorageService(configService);
+    jest
+      .spyOn(
+        service as unknown as { getClient: () => Promise<ObjectStorageClient> },
+        'getClient',
+      )
+      .mockResolvedValue(client);
+    const file = {
+      originalname: 'popup.jpg',
+      mimetype: 'image/jpeg',
+      size: 4,
+      buffer: Buffer.from('test'),
+    } as Express.Multer.File;
+
+    await service.uploadPopupImage(file);
+    await service.uploadPopupImage(file);
+
+    expect(client.getNamespace).toHaveBeenCalledTimes(1);
+    expect(client.putObject).toHaveBeenCalledTimes(2);
+    expect(client.putObject).toHaveBeenCalledWith(
+      expect.objectContaining({
+        namespaceName: 'resolved-namespace',
+        bucketName: 'xrp-monitor-popup',
+      }),
+    );
   });
 });
 

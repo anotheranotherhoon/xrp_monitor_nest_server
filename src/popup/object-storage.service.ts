@@ -17,6 +17,7 @@ import { dirname, extname, resolve, sep } from 'path';
 @Injectable()
 export class ObjectStorageService implements OnModuleDestroy {
   private clientPromise?: Promise<ObjectStorageClient>;
+  private namespacePromise?: Promise<string>;
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -32,7 +33,7 @@ export class ObjectStorageService implements OnModuleDestroy {
     const client = await this.getClient();
 
     await client.putObject({
-      namespaceName: this.requiredConfig('OCI_OBJECT_STORAGE_NAMESPACE'),
+      namespaceName: await this.getNamespace(client),
       bucketName: this.requiredConfig('OCI_OBJECT_STORAGE_BUCKET'),
       objectName,
       contentLength: file.size,
@@ -55,7 +56,7 @@ export class ObjectStorageService implements OnModuleDestroy {
 
     const client = await this.getClient();
     return client.getObject({
-      namespaceName: this.requiredConfig('OCI_OBJECT_STORAGE_NAMESPACE'),
+      namespaceName: await this.getNamespace(client),
       bucketName: this.requiredConfig('OCI_OBJECT_STORAGE_BUCKET'),
       objectName,
     });
@@ -74,7 +75,7 @@ export class ObjectStorageService implements OnModuleDestroy {
 
     const client = await this.getClient();
     await client.deleteObject({
-      namespaceName: this.requiredConfig('OCI_OBJECT_STORAGE_NAMESPACE'),
+      namespaceName: await this.getNamespace(client),
       bucketName: this.requiredConfig('OCI_OBJECT_STORAGE_BUCKET'),
       objectName,
     });
@@ -107,6 +108,18 @@ export class ObjectStorageService implements OnModuleDestroy {
   private getClient(): Promise<ObjectStorageClient> {
     this.clientPromise ??= this.createClient();
     return this.clientPromise;
+  }
+
+  private getNamespace(client: ObjectStorageClient): Promise<string> {
+    const configuredNamespace = this.configService.get<string>(
+      'OCI_OBJECT_STORAGE_NAMESPACE',
+    );
+    if (configuredNamespace) return Promise.resolve(configuredNamespace);
+
+    this.namespacePromise ??= client
+      .getNamespace({})
+      .then((response) => response.value);
+    return this.namespacePromise;
   }
 
   private async createClient(): Promise<ObjectStorageClient> {
