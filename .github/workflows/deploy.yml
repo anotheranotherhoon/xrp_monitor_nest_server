@@ -19,10 +19,10 @@ jobs:
           host: ${{ secrets.OCI_HOST }}
           username: ${{ secrets.OCI_USERNAME }}
           key: ${{ secrets.OCI_SSH_KEY }}
+          command_timeout: 30m
           script: |
             cd ~/app
             git pull origin master
             export CRYPTO_COMPARE='${{ secrets.CRYPTO_COMPARE }}'
             docker-compose config --quiet
-            docker-compose down
-            docker-compose up -d --build
+            docker-compose up -d --build --remove-orphans
